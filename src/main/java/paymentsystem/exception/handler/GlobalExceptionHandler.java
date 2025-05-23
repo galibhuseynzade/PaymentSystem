@@ -39,7 +39,6 @@ public class GlobalExceptionHandler {
             InactiveCardDepositException.class,
             InvalidAccountActivationException.class,
             InvalidCardActivationException.class,
-            IncorrectPasswordException.class,
             LimitExceededException.class,
             MaximumAccountCountException.class,
             MaximumCardCoundException.class,
@@ -66,11 +65,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IncorrectPasswordException.class)
     public ResponseEntity<ResponseModel> handleUnauthorized(RuntimeException ex) {
         return buildResponse(ex.getMessage(), HttpStatus.UNAUTHORIZED);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ResponseModel> handleInternalServerError(Exception ex) {
-        return buildResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
 
