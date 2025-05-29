@@ -1,5 +1,6 @@
 package paymentsystem.service;
 
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -47,6 +48,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     //    @Scheduled(cron = "0 0 0 * * *")
     @Scheduled(fixedRate = 30000)
+    @Transactional
     public void generateTransactions() {
         List<TransactionEntity> transactionEntityList = transactionRepository.findByStatus(TransactionStatus.PENDING);
 
@@ -92,7 +94,7 @@ public class TransactionServiceImpl implements TransactionService {
     private void checkCustomerStatus(CustomerEntity customerEntity) {
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusMonths(1);
-        if (transactionRepository.getMonthlyTotalByCustomer(customerEntity, startDate, endDate).compareTo(BigDecimal.valueOf(100)) > 0) {
+        if (transactionRepository.getMonthlyTotalByCustomer(customerEntity.getCustomerId(), startDate, endDate).compareTo(BigDecimal.valueOf(100)) > 0) {
             customerEntity.setStatus(CustomerStatus.SUSPECTED);
             customerRepository.save(customerEntity);
         }

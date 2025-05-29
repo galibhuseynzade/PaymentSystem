@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             AccountNotActiveException.class,
-            IllegalArgumentException.class,
+//            IllegalArgumentException.class,
             InactiveAccountDepositException.class,
             InactiveCardDepositException.class,
             InvalidAccountActivationException.class,
