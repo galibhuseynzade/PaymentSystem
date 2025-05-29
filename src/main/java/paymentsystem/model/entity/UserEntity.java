@@ -9,7 +9,9 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import paymentsystem.model.enums.UserRole;
 import paymentsystem.model.enums.UserStatus;
@@ -18,7 +20,8 @@ import java.time.LocalDate;
 
 @Table(name = "users")
 @Entity
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
