@@ -16,13 +16,13 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/account")
+@RequestMapping("/api/v1/account")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AccountController {
     AccountService accountService;
 
-    @GetMapping()
+    @GetMapping
     public List<AccountDto> findAllAccounts() {
         return accountService.findAllAccounts();
     }
