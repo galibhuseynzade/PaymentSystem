@@ -12,7 +12,9 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import paymentsystem.model.enums.TransactionStatus;
 
@@ -21,7 +23,8 @@ import java.time.LocalDate;
 
 @Table(name = "transaction")
 @Entity
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
