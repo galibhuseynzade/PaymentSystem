@@ -6,7 +6,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import paymentsystem.exception.exceptions.AccountNotFoundException;
 import paymentsystem.exception.exceptions.CardNotFoundException;
-import paymentsystem.mapper.TransactionMapper;
 import paymentsystem.model.entity.AccountEntity;
 import paymentsystem.model.entity.CardEntity;
 import paymentsystem.model.entity.CustomerEntity;
@@ -21,7 +20,6 @@ import paymentsystem.repository.TransactionRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 @Slf4j
@@ -35,7 +33,7 @@ public class TransactionSchedule {
     @Scheduled(fixedRate = 30000)
     @Transactional
     public void generateTransactions() {
-        try{
+        try {
             List<TransactionEntity> transactionEntityList = transactionRepository.findByStatus(TransactionStatus.PENDING);
             for (TransactionEntity transactionEntity : transactionEntityList) {
                 checkCustomerStatus(transactionEntity.getCustomerEntity());
@@ -46,7 +44,7 @@ public class TransactionSchedule {
                 transactionRepository.save(transactionEntity);
                 log.info("Transaction updated");
             }
-        } catch (NullPointerException ex){
+        } catch (NullPointerException ex) {
             log.info("No transactions found");
         }
     }

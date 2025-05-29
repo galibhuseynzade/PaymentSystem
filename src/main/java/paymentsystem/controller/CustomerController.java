@@ -14,7 +14,7 @@ import paymentsystem.service.CustomerService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/customer")
+@RequestMapping("/api/v1/customer")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CustomerController {
