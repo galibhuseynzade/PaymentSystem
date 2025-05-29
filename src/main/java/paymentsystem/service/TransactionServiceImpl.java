@@ -46,60 +46,6 @@ public class TransactionServiceImpl implements TransactionService {
     BigDecimal cardLimit = BigDecimal.valueOf(10);
     BigDecimal accountLimit = BigDecimal.valueOf(5);
 
-    //    @Scheduled(cron = "0 0 0 * * *")
-    @Scheduled(fixedRate = 30000)
-    @Transactional
-    public void generateTransactions() {
-        List<TransactionEntity> transactionEntityList = transactionRepository.findByStatus(TransactionStatus.PENDING);
-
-        for (TransactionEntity transactionEntity : transactionEntityList) {
-            checkCustomerStatus(transactionEntity.getCustomerEntity());
-            updateDebitBalance(transactionEntity.getDebit(), transactionEntity.getAmount());
-            updateCreditBalance(transactionEntity.getCredit(), transactionEntity.getAmount());
-
-            transactionEntity.setStatus(TransactionStatus.SUCCESS);
-            transactionRepository.save(transactionEntity);
-        }
-        log.info("Transactions updated");
-    }
-
-    private void updateDebitBalance(String debit, BigDecimal amount) {
-        if (debit.length() == 20) {
-            AccountEntity accountEntity = accountRepository.findById(debit).orElseThrow(AccountNotFoundException::new);
-            accountEntity.setBalance(accountEntity.getBalance().subtract(amount));
-            accountRepository.save(accountEntity);
-        } else {
-            CardEntity cardEntity = cardRepository.findById(debit).orElseThrow(CardNotFoundException::new);
-            cardEntity.setBalance(cardEntity.getBalance().subtract(amount));
-            cardRepository.save(cardEntity);
-        }
-    }
-
-    private void updateCreditBalance(String credit, BigDecimal amount) {
-        if (credit.length() == 20) {
-            AccountEntity accountEntity = accountRepository.findById(credit).orElse(null);
-            if (accountEntity != null) {
-                accountEntity.setBalance(accountEntity.getBalance().add(amount));
-                accountRepository.save(accountEntity);
-            }
-        } else {
-            CardEntity cardEntity = cardRepository.findById(credit).orElse(null);
-            if (cardEntity != null) {
-                cardEntity.setBalance(cardEntity.getBalance().add(amount));
-                cardRepository.save(cardEntity);
-            }
-        }
-    }
-
-    private void checkCustomerStatus(CustomerEntity customerEntity) {
-        LocalDate endDate = LocalDate.now();
-        LocalDate startDate = endDate.minusMonths(1);
-        if (transactionRepository.getMonthlyTotalByCustomer(customerEntity.getCustomerId(), startDate, endDate).compareTo(BigDecimal.valueOf(100)) > 0) {
-            customerEntity.setStatus(CustomerStatus.SUSPECTED);
-            customerRepository.save(customerEntity);
-        }
-    }
-
     @Override
     public TransactionDto transfer(String debit, String credit, BigDecimal amount) {
         checkCreditNumber(credit);
