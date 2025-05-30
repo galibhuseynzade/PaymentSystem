@@ -1,14 +1,13 @@
 package paymentsystem.service;
 
-import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import paymentsystem.config.DefaultValueConfiguration;
+import paymentsystem.config.LimitConfiguration;
 import paymentsystem.exception.exceptions.AccountNotActiveException;
-import paymentsystem.exception.exceptions.AccountNotFoundException;
 import paymentsystem.exception.exceptions.CardNotFoundException;
 import paymentsystem.exception.exceptions.LimitExceedsException;
 import paymentsystem.exception.exceptions.NotEnoughFundsException;
@@ -20,11 +19,9 @@ import paymentsystem.model.entity.CustomerEntity;
 import paymentsystem.model.entity.TransactionEntity;
 import paymentsystem.model.enums.AccountStatus;
 import paymentsystem.model.enums.CardStatus;
-import paymentsystem.model.enums.CustomerStatus;
 import paymentsystem.model.enums.TransactionStatus;
 import paymentsystem.repository.AccountRepository;
 import paymentsystem.repository.CardRepository;
-import paymentsystem.repository.CustomerRepository;
 import paymentsystem.repository.TransactionRepository;
 
 import java.math.BigDecimal;
@@ -42,17 +39,16 @@ public class TransactionServiceImpl implements TransactionService {
     TransactionMapper transactionMapper;
     AccountRepository accountRepository;
     CardRepository cardRepository;
-    CustomerRepository customerRepository;
-    BigDecimal cardLimit = BigDecimal.valueOf(10);
-    BigDecimal accountLimit = BigDecimal.valueOf(5);
+    LimitConfiguration limitConfiguration;
+    DefaultValueConfiguration defaultValueConfiguration;
 
     @Override
     public TransactionDto transfer(String debit, String credit, BigDecimal amount) {
         checkCreditNumber(credit);
 
-        if (debit.length() == 16) {
+        if (debit.length() == defaultValueConfiguration.getCardLength()) {
             return transferFromCard(debit, credit, amount);
-        } else if (debit.length() == 20) {
+        } else if (debit.length() == defaultValueConfiguration.getAccountLength()) {
             return transferFromAccount(debit, credit, amount);
         } else
             throw new IllegalArgumentException("Wrong input for debit");
@@ -70,7 +66,7 @@ public class TransactionServiceImpl implements TransactionService {
         if (accountEntity.getBalance().compareTo(amount) < 0)
             throw new NotEnoughFundsException();
 
-        if (accountEntity.getBalance().compareTo(accountLimit) < 0)
+        if (accountEntity.getBalance().compareTo(limitConfiguration.getMinAcceptableAccountBalance()) < 0)
             throw new LimitExceedsException();
 
         return createTransaction(customerEntity, debit, credit, amount);
@@ -82,7 +78,7 @@ public class TransactionServiceImpl implements TransactionService {
         CustomerEntity customerEntity = cardEntity.getCustomerEntity();
         checkCustomerTransactions(customerEntity);
 
-        if (cardEntity.getBalance().compareTo(cardLimit) >= 0
+        if (cardEntity.getBalance().compareTo(limitConfiguration.getMinAcceptableCardBalance()) >= 0
                 && cardEntity.getBalance().compareTo(amount) >= 0
                 && cardEntity.getStatus().equals(CardStatus.ACTIVE)) {
             return createTransaction(customerEntity, debit, credit, amount);
@@ -114,7 +110,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private void checkCreditNumber(String credit) {
-        if (credit.length() != 16 && credit.length() != 20)
+        if (credit.length() != defaultValueConfiguration.getAccountLength() && credit.length() != defaultValueConfiguration.getCardLength())
             throw new IllegalArgumentException("Wrong input for credit");
     }
 

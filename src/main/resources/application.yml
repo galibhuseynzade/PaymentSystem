@@ -46,3 +46,16 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+limits:
+  maxAccountCount: 3
+  maxCardCount: 2
+  dailyTransactionLimit: 100
+  minAcceptableAccountBalance: 5
+  minAcceptableCardBalance: 10
+
+defaultValues:
+  accountLength: 20
+  cardLength: 16
+  accountPeriodByYears: 5
+  cardPeriodByYears: 3

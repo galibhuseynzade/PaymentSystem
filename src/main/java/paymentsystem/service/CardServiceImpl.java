@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import paymentsystem.config.DefaultValueConfiguration;
+import paymentsystem.config.LimitConfiguration;
 import paymentsystem.exception.exceptions.CardNotFoundException;
 import paymentsystem.exception.exceptions.CustomerNotFoundException;
 import paymentsystem.exception.exceptions.InactiveCardDepositException;
@@ -34,14 +36,15 @@ public class CardServiceImpl implements CardService {
     CardMapper cardMapper;
     CustomerRepository customerRepository;
     List<CardStatus> validAccountStatusList = Arrays.asList(CardStatus.NEW, CardStatus.ACTIVE);
-    int maxCardCount = 2;
+    LimitConfiguration limitConfiguration;
+    DefaultValueConfiguration defaultValueConfiguration;
 
     @Override
     public CardDto createCard(Integer customerId) {
         CustomerEntity customerEntity = customerRepository.findById(customerId).orElseThrow(CustomerNotFoundException::new);
 
-        if (cardRepository.findByCustomerEntity_CustomerIdAndStatusIn(customerId, validAccountStatusList).size() >= maxCardCount)
-            throw new MaximumCardCoundException(maxCardCount);
+        if (cardRepository.findByCustomerEntity_CustomerIdAndStatusIn(customerId, validAccountStatusList).size() >= limitConfiguration.getMaxCardCount())
+            throw new MaximumCardCoundException(limitConfiguration.getMaxCardCount());
 
         String cardNumber = generateCardNumber();
         CardEntity cardEntity = CardEntity.builder()
@@ -49,7 +52,7 @@ public class CardServiceImpl implements CardService {
                 .customerEntity(customerEntity)
                 .balance(BigDecimal.ZERO)
                 .issueDate(LocalDate.now())
-                .expireDate(LocalDate.now().plusYears(3))
+                .expireDate(LocalDate.now().plusYears(defaultValueConfiguration.getCardPeriodByYears()))
                 .status(CardStatus.NEW)
                 .build();
 

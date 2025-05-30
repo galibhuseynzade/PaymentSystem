@@ -4,6 +4,8 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import paymentsystem.config.DefaultValueConfiguration;
+import paymentsystem.config.LimitConfiguration;
 import paymentsystem.exception.exceptions.AccountNotFoundException;
 import paymentsystem.exception.exceptions.CardNotFoundException;
 import paymentsystem.model.entity.AccountEntity;
@@ -28,6 +30,8 @@ public class TransactionSchedule {
     AccountRepository accountRepository;
     CardRepository cardRepository;
     CustomerRepository customerRepository;
+    LimitConfiguration limitConfiguration;
+    DefaultValueConfiguration defaultValueConfiguration;
 
     //    @Scheduled(cron = "0 0 0 * * *")
     @Scheduled(fixedRate = 30000)
@@ -50,7 +54,7 @@ public class TransactionSchedule {
     }
 
     private void updateDebitBalance(String debit, BigDecimal amount) {
-        if (debit.length() == 20) {
+        if (debit.length() == defaultValueConfiguration.getAccountLength()) {
             AccountEntity accountEntity = accountRepository.findById(debit).orElseThrow(AccountNotFoundException::new);
             accountEntity.setBalance(accountEntity.getBalance().subtract(amount));
             accountRepository.save(accountEntity);
@@ -62,7 +66,7 @@ public class TransactionSchedule {
     }
 
     private void updateCreditBalance(String credit, BigDecimal amount) {
-        if (credit.length() == 20) {
+        if (credit.length() == defaultValueConfiguration.getAccountLength()) {
             AccountEntity accountEntity = accountRepository.findById(credit).orElse(null);
             if (accountEntity != null) {
                 accountEntity.setBalance(accountEntity.getBalance().add(amount));
@@ -80,7 +84,7 @@ public class TransactionSchedule {
     private void checkCustomerStatus(CustomerEntity customerEntity) {
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusMonths(1);
-        if (transactionRepository.getMonthlyTotalByCustomer(customerEntity.getCustomerId(), startDate, endDate).compareTo(BigDecimal.valueOf(100)) > 0) {
+        if (transactionRepository.getMonthlyTotalByCustomer(customerEntity.getCustomerId(), startDate, endDate).compareTo(limitConfiguration.getDailyTransactionLimit()) > 0) {
             customerEntity.setStatus(CustomerStatus.SUSPECTED);
             customerRepository.save(customerEntity);
         }

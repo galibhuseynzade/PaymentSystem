@@ -4,7 +4,10 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import paymentsystem.config.DefaultValueConfiguration;
+import paymentsystem.config.LimitConfiguration;
 import paymentsystem.exception.exceptions.AccountNotFoundException;
 import paymentsystem.exception.exceptions.CustomerNotFoundException;
 import paymentsystem.exception.exceptions.InactiveAccountDepositException;
@@ -34,14 +37,15 @@ public class AccountServiceImpl implements AccountService {
     AccountMapper accountMapper;
     CustomerRepository customerRepository;
     List<AccountStatus> validAccountStatusList = Arrays.asList(AccountStatus.NEW, AccountStatus.ACTIVE);
-    int maxAccountCount = 3;
+    LimitConfiguration limitConfiguration;
+    DefaultValueConfiguration defaultValueConfiguration;
 
     @Override
     public AccountDto createAccount(Integer customerId) {
         CustomerEntity customerEntity = customerRepository.findById(customerId).orElseThrow(CustomerNotFoundException::new);
 
-        if (accountRepository.findByCustomerEntity_CustomerIdAndStatusIn(customerId, validAccountStatusList).size() >= maxAccountCount)
-            throw new MaximumAccountCountException(maxAccountCount);
+        if (accountRepository.findByCustomerEntity_CustomerIdAndStatusIn(customerId, validAccountStatusList).size() >= limitConfiguration.getMaxAccountCount())
+            throw new MaximumAccountCountException(limitConfiguration.getMaxAccountCount());
 
         String accountNumber = generateAccountNumber();
         AccountEntity accountEntity = AccountEntity.builder()
@@ -49,7 +53,7 @@ public class AccountServiceImpl implements AccountService {
                 .customerEntity(customerEntity)
                 .balance(BigDecimal.ZERO)
                 .openingDate(LocalDate.now())
-                .expireDate(LocalDate.now().plusYears(5))
+                .expireDate(LocalDate.now().plusYears(defaultValueConfiguration.getAccountPeriodByYears()))
                 .status(AccountStatus.NEW)
                 .build();
 
