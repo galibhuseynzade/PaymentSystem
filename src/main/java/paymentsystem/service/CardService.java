@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface CardService {
     CardDto createCard(Integer customerId);
-    String activateCard(String cardNumber);
-    String depositCard(String cardNumber, BigDecimal amount);
-    List<CardDto> findCardsByCustomerId(Integer customerId);
-    List<CardDto> findAllActiveCards();
-    List<CardDto> findAllCards();
+    void activateCard(String cardNumber);
+    void depositCard(String cardNumber, BigDecimal amount);
+    List<CardDto> getCardsByCustomerId(Integer customerId);
+    List<CardDto> getAllActiveCards();
+    List<CardDto> getAllCards();
 }
