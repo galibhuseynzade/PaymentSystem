@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface TransactionService {
     TransactionDto transfer(String debit, String credit, BigDecimal amount);
-    List<TransactionDto> findTransactionsByCustomerId(Integer customerId);
-    List<TransactionDto> findAllTransactions();
+    List<TransactionDto> getTransactionsByCustomerId(Integer customerId);
+    List<TransactionDto> getAllTransactions();
 }

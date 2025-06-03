@@ -22,8 +22,8 @@ public class UserController {
     UserService userService;
 
     @GetMapping
-    public List<UserDto> findAllUsers() {
-        return userService.findAllUsers();
+    public List<UserDto> getAllUsers() {
+        return userService.getAllUsers();
     }
 
     @PostMapping("/createGenericUser")
@@ -37,18 +37,18 @@ public class UserController {
     }
 
     @PutMapping("/activateUser")
-    public String activateUser(@RequestParam String username) {
-        return userService.activateUser(username);
+    public void activateUser(@RequestParam String username) {
+        userService.activateUser(username);
     }
 
     @PutMapping("/disableUser")
-    public String disableUser(@RequestParam String username) {
-        return userService.disableUser(username);
+    public void disableUser(@RequestParam String username) {
+        userService.disableUser(username);
     }
 
     @PutMapping("/changePassword")
-    public String changePassword(@RequestParam String username, @RequestParam String oldPassword, @RequestParam String newPassword) {
-        return userService.changePassword(username, oldPassword, newPassword);
+    public void changePassword(@RequestParam String username, @RequestParam String oldPassword, @RequestParam String newPassword) {
+        userService.changePassword(username, oldPassword, newPassword);
     }
 
 }

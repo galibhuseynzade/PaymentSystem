@@ -1,14 +1,12 @@
 package paymentsystem.service;
 
-import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import paymentsystem.config.LimitConfiguration;
 import paymentsystem.exception.exceptions.AccountNotActiveException;
-import paymentsystem.exception.exceptions.AccountNotFoundException;
 import paymentsystem.exception.exceptions.CardNotFoundException;
 import paymentsystem.exception.exceptions.LimitExceedsException;
 import paymentsystem.exception.exceptions.NotEnoughFundsException;
@@ -20,18 +18,14 @@ import paymentsystem.model.entity.CustomerEntity;
 import paymentsystem.model.entity.TransactionEntity;
 import paymentsystem.model.enums.AccountStatus;
 import paymentsystem.model.enums.CardStatus;
-import paymentsystem.model.enums.CustomerStatus;
-import paymentsystem.model.enums.TransactionStatus;
 import paymentsystem.repository.AccountRepository;
 import paymentsystem.repository.CardRepository;
-import paymentsystem.repository.CustomerRepository;
 import paymentsystem.repository.TransactionRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 @Service
 @Slf4j
@@ -42,9 +36,7 @@ public class TransactionServiceImpl implements TransactionService {
     TransactionMapper transactionMapper;
     AccountRepository accountRepository;
     CardRepository cardRepository;
-    CustomerRepository customerRepository;
-    BigDecimal cardLimit = BigDecimal.valueOf(10);
-    BigDecimal accountLimit = BigDecimal.valueOf(5);
+    LimitConfiguration limitConfiguration;
 
     @Override
     public TransactionDto transfer(String debit, String credit, BigDecimal amount) {
@@ -70,7 +62,7 @@ public class TransactionServiceImpl implements TransactionService {
         if (accountEntity.getBalance().compareTo(amount) < 0)
             throw new NotEnoughFundsException();
 
-        if (accountEntity.getBalance().compareTo(accountLimit) < 0)
+        if (accountEntity.getBalance().compareTo(limitConfiguration.getMinAcceptableAccountBalance()) < 0)
             throw new LimitExceedsException();
 
         return createTransaction(customerEntity, debit, credit, amount);
@@ -82,7 +74,7 @@ public class TransactionServiceImpl implements TransactionService {
         CustomerEntity customerEntity = cardEntity.getCustomerEntity();
         checkCustomerTransactions(customerEntity);
 
-        if (cardEntity.getBalance().compareTo(cardLimit) >= 0
+        if (cardEntity.getBalance().compareTo(limitConfiguration.getMinAcceptableCardBalance()) >= 0
                 && cardEntity.getBalance().compareTo(amount) >= 0
                 && cardEntity.getStatus().equals(CardStatus.ACTIVE)) {
             return createTransaction(customerEntity, debit, credit, amount);
@@ -109,40 +101,32 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private void checkCustomerTransactions(CustomerEntity customerEntity) {
-        if (!transactionRepository.findByCustomerEntityAndDate(customerEntity, LocalDate.now()).isEmpty())
+        if (!transactionRepository.findByCustomerEntityAndTransactionDate(customerEntity, LocalDate.now()).isEmpty())
             throw new LimitExceedsException();
     }
 
     private void checkCreditNumber(String credit) {
-        if (credit.length() != 16 && credit.length() != 20)
+        if (credit.length() != 20 && credit.length() != 16)
             throw new IllegalArgumentException("Wrong input for credit");
     }
 
     private TransactionDto createTransaction(CustomerEntity customerEntity,
                                              String debit, String credit,
                                              BigDecimal amount) {
-        TransactionEntity transactionEntity = TransactionEntity.builder()
-                .transactionId(generateTransactionId())
-                .customerEntity(customerEntity)
-                .debit(debit)
-                .credit(credit)
-                .date(LocalDate.now())
-                .amount(amount)
-                .status(TransactionStatus.PENDING)
-                .build();
+        TransactionEntity transactionEntity = transactionMapper.buildTransactionEntity(customerEntity, debit, credit, amount);
 
         transactionRepository.save(transactionEntity);
         return getTransactionDto(transactionEntity);
     }
 
     @Override
-    public List<TransactionDto> findTransactionsByCustomerId(Integer customerId) {
+    public List<TransactionDto> getTransactionsByCustomerId(Integer customerId) {
         List<TransactionEntity> transactionEntities = transactionRepository.findByCustomerEntity_CustomerId(customerId);
         return getTransactionDtoList(transactionEntities);
     }
 
     @Override
-    public List<TransactionDto> findAllTransactions() {
+    public List<TransactionDto> getAllTransactions() {
         List<TransactionEntity> transactionEntities = transactionRepository.findAll();
         return getTransactionDtoList(transactionEntities);
     }
@@ -159,14 +143,5 @@ public class TransactionServiceImpl implements TransactionService {
             transactionDtoList.add(getTransactionDto(transactionEntity));
         }
         return transactionDtoList;
-    }
-
-    private String generateTransactionId() {
-        Random random = new Random();
-        StringBuilder stringBuilder = new StringBuilder("TR");
-        for (int i = 0; i < 18; i++) {
-            stringBuilder.append(random.nextInt(10));
-        }
-        return stringBuilder.toString();
     }
 }

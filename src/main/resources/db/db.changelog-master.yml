@@ -13,3 +13,5 @@ databaseChangeLog:
       file: db/changelog/20250521-alter-table-user.sql
   - include:
       file: db/changelog/20250523-alter-table-transaction.sql
+  - include:
+      file: db/changelog/20250530-alter-table-transaction.sql

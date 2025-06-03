@@ -21,7 +21,7 @@ public class TransactionDto {
     Integer customerId;
     String debit;
     String credit;
-    LocalDate date;
+    LocalDate transactionDate;
     BigDecimal amount;
     TransactionStatus status;
 }

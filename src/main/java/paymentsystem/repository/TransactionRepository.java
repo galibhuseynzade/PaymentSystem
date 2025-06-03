@@ -16,8 +16,8 @@ import java.util.List;
 public interface TransactionRepository extends JpaRepository<TransactionEntity, String> {
     List<TransactionEntity> findByCustomerEntity_CustomerId(Integer customerId);
     List<TransactionEntity> findByStatus(TransactionStatus status);
-    List<TransactionEntity> findByCustomerEntityAndDate(CustomerEntity customerEntity, LocalDate date);
-    @Query("SELECT SUM(t.amount) FROM TransactionEntity t WHERE t.customerEntity.customerId = :customerId AND t.date BETWEEN :startDate AND :endDate")
+    List<TransactionEntity> findByCustomerEntityAndTransactionDate(CustomerEntity customerEntity, LocalDate date);
+    @Query("SELECT SUM(t.amount) FROM TransactionEntity t WHERE t.customerEntity.customerId = :customerId AND t.transactionDate BETWEEN :startDate AND :endDate")
     BigDecimal getMonthlyTotalByCustomer(
             @Param("customerId") Integer customerId,
             @Param("startDate") LocalDate startDate,

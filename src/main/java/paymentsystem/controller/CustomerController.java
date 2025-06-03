@@ -1,5 +1,6 @@
 package paymentsystem.controller;
 
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,12 +22,12 @@ public class CustomerController {
     CustomerService customerService;
 
     @GetMapping
-    public List<CustomerDto> findAllCustomers() {
-        return customerService.findAllCustomers();
+    public List<CustomerDto> getAllCustomers() {
+        return customerService.getAllCustomers();
     }
 
     @PostMapping("/createCustomer")
-    public CustomerDto createCustomer(@RequestBody CustomerDto customerDto) {
+    public CustomerDto createCustomer(@RequestBody @Valid CustomerDto customerDto) {
         return customerService.createCustomer(customerDto);
     }
 }

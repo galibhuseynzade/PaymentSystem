@@ -14,11 +14,9 @@ import paymentsystem.exception.exceptions.UserNotFoundException;
 import paymentsystem.mapper.UserMapper;
 import paymentsystem.model.dto.UserDto;
 import paymentsystem.model.entity.UserEntity;
-import paymentsystem.model.enums.UserRole;
 import paymentsystem.model.enums.UserStatus;
 import paymentsystem.repository.UserRepository;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,19 +28,12 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
     UserMapper userMapper;
 
-
     @Override
     public UserDto createGenericUser(String username, String password) {
         if (userRepository.existsById(username))
             throw new UserAlreadyExistsException();
 
-        UserEntity userEntity = UserEntity.builder()
-                .username(username)
-                .password(password)
-                .role(UserRole.USER)
-                .registrationDate(LocalDate.now())
-                .status(UserStatus.ACTIVE)
-                .build();
+        UserEntity userEntity = userMapper.buildUserEntity(username, password);
 
         userRepository.save(userEntity);
         log.info("User created " + username);
@@ -54,13 +45,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsById(username))
             throw new UserAlreadyExistsException();
 
-        UserEntity userEntity = UserEntity.builder()
-                .username(username)
-                .password(password)
-                .role(UserRole.ADMIN)
-                .registrationDate(LocalDate.now())
-                .status(UserStatus.ACTIVE)
-                .build();
+        UserEntity userEntity = userMapper.buildUserEntity(username, password);
 
         userRepository.save(userEntity);
         log.info("User created " + username);
@@ -68,7 +53,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String activateUser(String username) {
+    public void activateUser(String username) {
         if (!userRepository.existsById(username))
             throw new UserNotFoundException();
 
@@ -78,11 +63,10 @@ public class UserServiceImpl implements UserService {
 
         userEntity.setStatus(UserStatus.ACTIVE);
         userRepository.save(userEntity);
-        return "User activated successfully";
     }
 
     @Override
-    public String disableUser(String username) {
+    public void disableUser(String username) {
         if (!userRepository.existsById(username))
             throw new UserNotFoundException();
 
@@ -92,11 +76,10 @@ public class UserServiceImpl implements UserService {
 
         userEntity.setStatus(UserStatus.DISABLED);
         userRepository.save(userEntity);
-        return "User disabled successfully";
     }
 
     @Override
-    public String changePassword(String username, String oldPassword, String newPassword) {
+    public void changePassword(String username, String oldPassword, String newPassword) {
         if (!userRepository.existsById(username))
             throw new UserNotFoundException();
 
@@ -109,11 +92,10 @@ public class UserServiceImpl implements UserService {
 
         userEntity.setPassword(newPassword);
         userRepository.save(userEntity);
-        return "Password changed successfully";
     }
 
     @Override
-    public List<UserDto> findAllUsers() {
+    public List<UserDto> getAllUsers() {
         List<UserEntity> userEntityList = userRepository.findByStatus(UserStatus.ACTIVE);
         return userEntityList.stream().map(userMapper::mapToUserDto).collect(Collectors.toList());
     }
