@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,18 +24,18 @@ public class CardController {
     CardService cardService;
 
     @GetMapping
-    public List<CardDto> findAllCards() {
-        return cardService.findAllCards();
+    public List<CardDto> getAllCards() {
+        return cardService.getAllCards();
     }
 
-    @GetMapping("/findAllActiveCards")
-    public List<CardDto> findAllActiveCards() {
-        return cardService.findAllActiveCards();
+    @GetMapping("/getAllActiveCards")
+    public List<CardDto> getAllActiveCards() {
+        return cardService.getAllActiveCards();
     }
 
-    @GetMapping("/findCardsByCustomerId")
-    public List<CardDto> findCardsByCustomerId(@RequestParam Integer customerId) {
-        return cardService.findCardsByCustomerId(customerId);
+    @GetMapping("/getCardsByCustomerId/{customerId}")
+    public List<CardDto> getCardsByCustomerId(@PathVariable Integer customerId) {
+        return cardService.getCardsByCustomerId(customerId);
     }
 
     @PostMapping("/createCard")
@@ -43,12 +44,12 @@ public class CardController {
     }
 
     @PutMapping("/activateCard")
-    public String activateCard(@RequestParam String cardNumber) {
-        return cardService.activateCard(cardNumber);
+    public void activateCard(@RequestParam String cardNumber) {
+        cardService.activateCard(cardNumber);
     }
 
     @PutMapping("/depositCard")
-    public String depositCard(@RequestParam String cardNumber, @RequestParam BigDecimal amount) {
-        return cardService.depositCard(cardNumber, amount);
+    public void depositCard(@RequestParam String cardNumber, @RequestParam BigDecimal amount) {
+        cardService.depositCard(cardNumber, amount);
     }
 }

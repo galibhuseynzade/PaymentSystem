@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,13 +23,13 @@ public class TransactionController {
     TransactionService transactionService;
 
     @GetMapping
-    public List<TransactionDto> findAllTransactions() {
-        return transactionService.findAllTransactions();
+    public List<TransactionDto> getAllTransactions() {
+        return transactionService.getAllTransactions();
     }
 
-    @GetMapping("/findTransactionsByCustomerId")
-    public List<TransactionDto> findTransactionsByCustomerId(@RequestParam Integer customerId) {
-        return transactionService.findTransactionsByCustomerId(customerId);
+    @GetMapping("/getTransactionsByCustomerId/{customerId}")
+    public List<TransactionDto> getTransactionsByCustomerId(@PathVariable Integer customerId) {
+        return transactionService.getTransactionsByCustomerId(customerId);
     }
 
     @PostMapping("/transfer")

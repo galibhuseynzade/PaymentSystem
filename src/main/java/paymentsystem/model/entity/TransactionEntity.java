@@ -39,7 +39,7 @@ public class TransactionEntity {
 
     String debit;
     String credit;
-    LocalDate date;
+    LocalDate transactionDate;
     BigDecimal amount;
 
     @Enumerated(EnumType.STRING)

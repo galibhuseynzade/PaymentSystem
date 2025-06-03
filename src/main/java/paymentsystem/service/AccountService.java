@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface AccountService {
     AccountDto createAccount(Integer customerId);
-    String activateAccount(String accountNumber);
-    String depositAccount(String accountNumber, BigDecimal amount);
-    List<AccountDto> findAccountsByCustomerId(Integer customerId);
-    List<AccountDto> findAllActiveAccounts();
-    List<AccountDto> findAllAccounts();
+    void activateAccount(String accountNumber);
+    void depositAccount(String accountNumber, BigDecimal amount);
+    List<AccountDto> getAccountsByCustomerId(Integer customerId);
+    List<AccountDto> getAllActiveAccounts();
+    List<AccountDto> getAllAccounts();
 }

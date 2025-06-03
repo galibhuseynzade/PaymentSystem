@@ -2,6 +2,7 @@ package paymentsystem.exception.handler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import paymentsystem.exception.exceptions.AccountNotActiveException;
@@ -34,7 +35,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             AccountNotActiveException.class,
-//            IllegalArgumentException.class,
+            IllegalArgumentException.class,
             InactiveAccountDepositException.class,
             InactiveCardDepositException.class,
             InvalidAccountActivationException.class,
@@ -65,6 +66,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IncorrectPasswordException.class)
     public ResponseEntity<ResponseModel> handleUnauthorized(RuntimeException ex) {
         return buildResponse(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ResponseModel> handleValidation(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getAllErrors().getFirst().getDefaultMessage();
+        return buildResponse(message, HttpStatus.BAD_REQUEST);
     }
 }
 

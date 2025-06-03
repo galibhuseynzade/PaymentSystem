@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import paymentsystem.config.DefaultValueConfiguration;
 import paymentsystem.config.LimitConfiguration;
 import paymentsystem.exception.exceptions.AccountNotActiveException;
 import paymentsystem.exception.exceptions.CardNotFoundException;
@@ -19,7 +18,6 @@ import paymentsystem.model.entity.CustomerEntity;
 import paymentsystem.model.entity.TransactionEntity;
 import paymentsystem.model.enums.AccountStatus;
 import paymentsystem.model.enums.CardStatus;
-import paymentsystem.model.enums.TransactionStatus;
 import paymentsystem.repository.AccountRepository;
 import paymentsystem.repository.CardRepository;
 import paymentsystem.repository.TransactionRepository;
@@ -28,7 +26,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 @Service
 @Slf4j
@@ -40,15 +37,14 @@ public class TransactionServiceImpl implements TransactionService {
     AccountRepository accountRepository;
     CardRepository cardRepository;
     LimitConfiguration limitConfiguration;
-    DefaultValueConfiguration defaultValueConfiguration;
 
     @Override
     public TransactionDto transfer(String debit, String credit, BigDecimal amount) {
         checkCreditNumber(credit);
 
-        if (debit.length() == defaultValueConfiguration.getCardLength()) {
+        if (debit.length() == 16) {
             return transferFromCard(debit, credit, amount);
-        } else if (debit.length() == defaultValueConfiguration.getAccountLength()) {
+        } else if (debit.length() == 20) {
             return transferFromAccount(debit, credit, amount);
         } else
             throw new IllegalArgumentException("Wrong input for debit");
@@ -105,40 +101,32 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private void checkCustomerTransactions(CustomerEntity customerEntity) {
-        if (!transactionRepository.findByCustomerEntityAndDate(customerEntity, LocalDate.now()).isEmpty())
+        if (!transactionRepository.findByCustomerEntityAndTransactionDate(customerEntity, LocalDate.now()).isEmpty())
             throw new LimitExceedsException();
     }
 
     private void checkCreditNumber(String credit) {
-        if (credit.length() != defaultValueConfiguration.getAccountLength() && credit.length() != defaultValueConfiguration.getCardLength())
+        if (credit.length() != 20 && credit.length() != 16)
             throw new IllegalArgumentException("Wrong input for credit");
     }
 
     private TransactionDto createTransaction(CustomerEntity customerEntity,
                                              String debit, String credit,
                                              BigDecimal amount) {
-        TransactionEntity transactionEntity = TransactionEntity.builder()
-                .transactionId(generateTransactionId())
-                .customerEntity(customerEntity)
-                .debit(debit)
-                .credit(credit)
-                .date(LocalDate.now())
-                .amount(amount)
-                .status(TransactionStatus.PENDING)
-                .build();
+        TransactionEntity transactionEntity = transactionMapper.buildTransactionEntity(customerEntity, debit, credit, amount);
 
         transactionRepository.save(transactionEntity);
         return getTransactionDto(transactionEntity);
     }
 
     @Override
-    public List<TransactionDto> findTransactionsByCustomerId(Integer customerId) {
+    public List<TransactionDto> getTransactionsByCustomerId(Integer customerId) {
         List<TransactionEntity> transactionEntities = transactionRepository.findByCustomerEntity_CustomerId(customerId);
         return getTransactionDtoList(transactionEntities);
     }
 
     @Override
-    public List<TransactionDto> findAllTransactions() {
+    public List<TransactionDto> getAllTransactions() {
         List<TransactionEntity> transactionEntities = transactionRepository.findAll();
         return getTransactionDtoList(transactionEntities);
     }
@@ -155,14 +143,5 @@ public class TransactionServiceImpl implements TransactionService {
             transactionDtoList.add(getTransactionDto(transactionEntity));
         }
         return transactionDtoList;
-    }
-
-    private String generateTransactionId() {
-        Random random = new Random();
-        StringBuilder stringBuilder = new StringBuilder("TR");
-        for (int i = 0; i < 18; i++) {
-            stringBuilder.append(random.nextInt(10));
-        }
-        return stringBuilder.toString();
     }
 }

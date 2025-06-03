@@ -1,10 +1,12 @@
 package paymentsystem.schedule;
 
 import jakarta.transaction.Transactional;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import paymentsystem.config.DefaultValueConfiguration;
 import paymentsystem.config.LimitConfiguration;
 import paymentsystem.exception.exceptions.AccountNotFoundException;
 import paymentsystem.exception.exceptions.CardNotFoundException;
@@ -25,36 +27,42 @@ import java.util.List;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TransactionSchedule {
     TransactionRepository transactionRepository;
     AccountRepository accountRepository;
     CardRepository cardRepository;
     CustomerRepository customerRepository;
     LimitConfiguration limitConfiguration;
-    DefaultValueConfiguration defaultValueConfiguration;
 
     //    @Scheduled(cron = "0 0 0 * * *")
     @Scheduled(fixedRate = 30000)
     @Transactional
     public void generateTransactions() {
-        try {
-            List<TransactionEntity> transactionEntityList = transactionRepository.findByStatus(TransactionStatus.PENDING);
-            for (TransactionEntity transactionEntity : transactionEntityList) {
-                checkCustomerStatus(transactionEntity.getCustomerEntity());
-                updateDebitBalance(transactionEntity.getDebit(), transactionEntity.getAmount());
-                updateCreditBalance(transactionEntity.getCredit(), transactionEntity.getAmount());
+        List<TransactionEntity> transactionEntityList = transactionRepository.findByStatus(TransactionStatus.PENDING);
+        for (TransactionEntity transactionEntity : transactionEntityList) {
+            checkCustomerStatus(transactionEntity.getCustomerEntity());
+            updateDebitBalance(transactionEntity.getDebit(), transactionEntity.getAmount());
+            updateCreditBalance(transactionEntity.getCredit(), transactionEntity.getAmount());
 
-                transactionEntity.setStatus(TransactionStatus.SUCCESS);
-                transactionRepository.save(transactionEntity);
-                log.info("Transaction updated");
-            }
-        } catch (NullPointerException ex) {
-            log.info("No transactions found");
+            transactionEntity.setStatus(TransactionStatus.SUCCESS);
+            transactionRepository.save(transactionEntity);
+            log.info("Transaction updated");
+        }
+    }
+
+    private void checkCustomerStatus(CustomerEntity customerEntity) {
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusMonths(1);
+        if (transactionRepository.getMonthlyTotalByCustomer(customerEntity.getCustomerId(), startDate, endDate).compareTo(limitConfiguration.getDailyTransactionLimit()) > 0) {
+            customerEntity.setStatus(CustomerStatus.SUSPECTED);
+            customerRepository.save(customerEntity);
         }
     }
 
     private void updateDebitBalance(String debit, BigDecimal amount) {
-        if (debit.length() == defaultValueConfiguration.getAccountLength()) {
+        if (debit.length() == 20) {
             AccountEntity accountEntity = accountRepository.findById(debit).orElseThrow(AccountNotFoundException::new);
             accountEntity.setBalance(accountEntity.getBalance().subtract(amount));
             accountRepository.save(accountEntity);
@@ -66,7 +74,7 @@ public class TransactionSchedule {
     }
 
     private void updateCreditBalance(String credit, BigDecimal amount) {
-        if (credit.length() == defaultValueConfiguration.getAccountLength()) {
+        if (credit.length() == 20) {
             AccountEntity accountEntity = accountRepository.findById(credit).orElse(null);
             if (accountEntity != null) {
                 accountEntity.setBalance(accountEntity.getBalance().add(amount));
@@ -78,15 +86,6 @@ public class TransactionSchedule {
                 cardEntity.setBalance(cardEntity.getBalance().add(amount));
                 cardRepository.save(cardEntity);
             }
-        }
-    }
-
-    private void checkCustomerStatus(CustomerEntity customerEntity) {
-        LocalDate endDate = LocalDate.now();
-        LocalDate startDate = endDate.minusMonths(1);
-        if (transactionRepository.getMonthlyTotalByCustomer(customerEntity.getCustomerId(), startDate, endDate).compareTo(limitConfiguration.getDailyTransactionLimit()) > 0) {
-            customerEntity.setStatus(CustomerStatus.SUSPECTED);
-            customerRepository.save(customerEntity);
         }
     }
 }
