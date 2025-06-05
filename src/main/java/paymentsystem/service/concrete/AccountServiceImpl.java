@@ -1,4 +1,4 @@
-package paymentsystem.service;
+package paymentsystem.service.concrete;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import paymentsystem.config.LimitConfiguration;
+import paymentsystem.config.LimitProperties;
 import paymentsystem.exception.exceptions.AccountNotFoundException;
 import paymentsystem.exception.exceptions.CustomerNotFoundException;
 import paymentsystem.exception.exceptions.InactiveAccountDepositException;
@@ -21,6 +21,7 @@ import paymentsystem.model.entity.CustomerEntity;
 import paymentsystem.model.enums.AccountStatus;
 import paymentsystem.repository.AccountRepository;
 import paymentsystem.repository.CustomerRepository;
+import paymentsystem.service.abstraction.AccountService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -36,14 +37,14 @@ public class AccountServiceImpl implements AccountService {
     AccountMapper accountMapper;
     CustomerRepository customerRepository;
     List<AccountStatus> validAccountStatusList = Arrays.asList(AccountStatus.NEW, AccountStatus.ACTIVE);
-    LimitConfiguration limitConfiguration;
+    LimitProperties limitProperties;
 
     @Override
     public AccountDto createAccount(Integer customerId) {
         CustomerEntity customerEntity = customerRepository.findById(customerId).orElseThrow(CustomerNotFoundException::new);
 
-        if (accountRepository.countByCustomerEntity_CustomerIdAndStatusIn(customerId, validAccountStatusList) >= limitConfiguration.getMaxAccountCount())
-            throw new MaximumAccountCountException(limitConfiguration.getMaxAccountCount());
+        if (accountRepository.countByCustomerEntity_CustomerIdAndStatusIn(customerId, validAccountStatusList) >= limitProperties.getMaxAccountCount())
+            throw new MaximumAccountCountException(limitProperties.getMaxAccountCount());
 
         AccountEntity accountEntity = accountMapper.buildAccountEntity(customerEntity);
 

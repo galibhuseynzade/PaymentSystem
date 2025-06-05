@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Component
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LimitConfiguration {
+public class LimitProperties {
     @Value("${limits.maxAccountCount}")
     Integer maxAccountCount;
 

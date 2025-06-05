@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import paymentsystem.model.dto.AccountDto;
-import paymentsystem.service.AccountService;
+import paymentsystem.service.abstraction.AccountService;
 
 import java.math.BigDecimal;
 
@@ -33,7 +33,7 @@ public class AccountController {
         return accountService.getAllAccounts(pageable);
     }
 
-    @GetMapping("/getAllActiveAccounts")
+    @GetMapping("/allActiveAccounts")
     public Page<AccountDto> getAllActiveAccounts(@RequestParam(defaultValue = "0", required = false) Integer page,
                                                  @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
@@ -41,7 +41,7 @@ public class AccountController {
         return accountService.getAllActiveAccounts(pageable);
     }
 
-    @GetMapping("/getAccountsByCustomerId/{customerId}")
+    @GetMapping("/accountsByCustomerId/{customerId}")
     public Page<AccountDto> getAccountsByCustomerId(@PathVariable Integer customerId,
                                                     @RequestParam(defaultValue = "0", required = false) Integer page,
                                                     @RequestParam(defaultValue = "10", required = false) Integer size
@@ -50,18 +50,18 @@ public class AccountController {
         return accountService.getAccountsByCustomerId(customerId, pageable);
     }
 
-    @PostMapping("/createAccount")
-    public AccountDto createAccount(@RequestParam Integer customerId) {
+    @PostMapping("/{customerId}")
+    public AccountDto createAccount(@PathVariable Integer customerId) {
         return accountService.createAccount(customerId);
     }
 
-    @PutMapping("/activateAccount")
-    public void activateAccount(@RequestParam String accountNumber) {
+    @PutMapping("/activateAccount/{accountNumber}")
+    public void activateAccount(@PathVariable String accountNumber) {
         accountService.activateAccount(accountNumber);
     }
 
-    @PutMapping("/depositAccount")
-    public void depositAccount(@RequestParam String accountNumber, @RequestParam BigDecimal amount) {
+    @PutMapping("/depositAccount/{accountNumber}")
+    public void depositAccount(@PathVariable String accountNumber, @RequestParam BigDecimal amount) {
         accountService.depositAccount(accountNumber, amount);
     }
 }

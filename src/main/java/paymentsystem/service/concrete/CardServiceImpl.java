@@ -1,4 +1,4 @@
-    package paymentsystem.service;
+    package paymentsystem.service.concrete;
 
     import lombok.AccessLevel;
     import lombok.RequiredArgsConstructor;
@@ -8,7 +8,7 @@
     import org.springframework.data.domain.PageImpl;
     import org.springframework.data.domain.Pageable;
     import org.springframework.stereotype.Service;
-    import paymentsystem.config.LimitConfiguration;
+    import paymentsystem.config.LimitProperties;
     import paymentsystem.exception.exceptions.CardNotFoundException;
     import paymentsystem.exception.exceptions.CustomerNotFoundException;
     import paymentsystem.exception.exceptions.InactiveCardDepositException;
@@ -21,6 +21,7 @@
     import paymentsystem.model.enums.CardStatus;
     import paymentsystem.repository.CardRepository;
     import paymentsystem.repository.CustomerRepository;
+    import paymentsystem.service.abstraction.CardService;
 
     import java.math.BigDecimal;
     import java.util.ArrayList;
@@ -36,14 +37,14 @@
         CardMapper cardMapper;
         CustomerRepository customerRepository;
         List<CardStatus> validAccountStatusList = Arrays.asList(CardStatus.NEW, CardStatus.ACTIVE);
-        LimitConfiguration limitConfiguration;
+        LimitProperties limitProperties;
 
         @Override
         public CardDto createCard(Integer customerId) {
             CustomerEntity customerEntity = customerRepository.findById(customerId).orElseThrow(CustomerNotFoundException::new);
 
-            if (cardRepository.countByCustomerEntity_CustomerIdAndStatusIn(customerId, validAccountStatusList) >= limitConfiguration.getMaxCardCount())
-                throw new MaximumCardCoundException(limitConfiguration.getMaxCardCount());
+            if (cardRepository.countByCustomerEntity_CustomerIdAndStatusIn(customerId, validAccountStatusList) >= limitProperties.getMaxCardCount())
+                throw new MaximumCardCoundException(limitProperties.getMaxCardCount());
 
             CardEntity cardEntity = cardMapper.buildCardEntity(customerEntity);
 

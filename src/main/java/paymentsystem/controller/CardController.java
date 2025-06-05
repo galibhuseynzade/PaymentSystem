@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import paymentsystem.model.dto.CardDto;
-import paymentsystem.service.CardService;
+import paymentsystem.service.abstraction.CardService;
 
 import java.math.BigDecimal;
 
@@ -33,7 +33,7 @@ public class CardController {
         return cardService.getAllCards(pageable);
     }
 
-    @GetMapping("/getAllActiveCards")
+    @GetMapping("/allActiveCards")
     public Page<CardDto> getAllActiveCards(@RequestParam(defaultValue = "0", required = false) Integer page,
                                            @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
@@ -41,7 +41,7 @@ public class CardController {
         return cardService.getAllActiveCards(pageable);
     }
 
-    @GetMapping("/getCardsByCustomerId/{customerId}")
+    @GetMapping("/cardsByCustomerId/{customerId}")
     public Page<CardDto> getCardsByCustomerId(@PathVariable Integer customerId,
                                               @RequestParam(defaultValue = "0", required = false) Integer page,
                                               @RequestParam(defaultValue = "10", required = false) Integer size
@@ -50,18 +50,18 @@ public class CardController {
         return cardService.getCardsByCustomerId(customerId, pageable);
     }
 
-    @PostMapping("/createCard")
-    public CardDto createCard(@RequestParam Integer customerId) {
+    @PostMapping("/{customerId}")
+    public CardDto createCard(@PathVariable Integer customerId) {
         return cardService.createCard(customerId);
     }
 
-    @PutMapping("/activateCard")
-    public void activateCard(@RequestParam String cardNumber) {
+    @PutMapping("/activateCard/{cardNumber}")
+    public void activateCard(@PathVariable String cardNumber) {
         cardService.activateCard(cardNumber);
     }
 
-    @PutMapping("/depositCard")
-    public void depositCard(@RequestParam String cardNumber, @RequestParam BigDecimal amount) {
+    @PutMapping("/depositCard/{cardNumber}")
+    public void depositCard(@PathVariable String cardNumber, @RequestParam BigDecimal amount) {
         cardService.depositCard(cardNumber, amount);
     }
 }

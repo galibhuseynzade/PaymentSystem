@@ -10,15 +10,13 @@ import java.time.LocalDate;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-    UserEntity mapToUserEntity(UserDto userDto);
-
     UserDto mapToUserDto(UserEntity userEntity);
 
-    default UserEntity buildUserEntity(String username, String password) {
+    default UserEntity buildUserEntity(String username, String password, UserRole userRole) {
         return UserEntity.builder()
                 .username(username)
                 .password(password)
-                .role(UserRole.USER)
+                .role(userRole)
                 .registrationDate(LocalDate.now())
                 .status(UserStatus.ACTIVE)
                 .build();

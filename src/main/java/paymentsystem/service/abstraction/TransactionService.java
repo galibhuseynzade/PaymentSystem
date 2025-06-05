@@ -1,4 +1,4 @@
-package paymentsystem.service;
+package paymentsystem.service.abstraction;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

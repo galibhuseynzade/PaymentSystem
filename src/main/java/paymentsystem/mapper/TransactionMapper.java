@@ -12,8 +12,6 @@ import java.util.Random;
 
 @Mapper(componentModel = "spring")
 public interface TransactionMapper {
-    TransactionEntity mapToTransactionEntity(TransactionDto transactionDto);
-
     TransactionDto mapToTransactionDto(TransactionEntity transactionEntity);
 
     default TransactionEntity buildTransactionEntity(CustomerEntity customerEntity, String debit, String credit, BigDecimal amount) {

@@ -12,7 +12,6 @@ import java.util.Random;
 
 @Mapper(componentModel = "spring")
 public interface CardMapper {
-    CardEntity mapToCardEntity(CardDto cardDto);
     CardDto mapToCardDto(CardEntity cardEntity);
 
     default CardEntity buildCardEntity(CustomerEntity customerEntity) {

@@ -1,11 +1,10 @@
-package paymentsystem.service;
+package paymentsystem.service.abstraction;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import paymentsystem.model.dto.CardDto;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 public interface CardService {
     CardDto createCard(Integer customerId);

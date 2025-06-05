@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import paymentsystem.model.dto.CustomerDto;
-import paymentsystem.service.CustomerService;
+import paymentsystem.service.abstraction.CustomerService;
 
 @RestController
 @RequestMapping("/api/v1/customer")
@@ -31,7 +31,7 @@ public class CustomerController {
         return customerService.getAllCustomers(pageable);
     }
 
-    @PostMapping("/createCustomer")
+    @PostMapping
     public CustomerDto createCustomer(@RequestBody @Valid CustomerDto customerDto) {
         return customerService.createCustomer(customerDto);
     }

@@ -1,4 +1,4 @@
-package paymentsystem.service;
+package paymentsystem.service.concrete;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +13,10 @@ import paymentsystem.model.dto.CustomerDto;
 import paymentsystem.model.entity.CustomerEntity;
 import paymentsystem.model.enums.CustomerStatus;
 import paymentsystem.repository.CustomerRepository;
+import paymentsystem.service.abstraction.CustomerService;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j

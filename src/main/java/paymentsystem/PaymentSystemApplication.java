@@ -13,4 +13,3 @@ public class PaymentSystemApplication {
         SpringApplication.run(PaymentSystemApplication.class, args);
     }
 }
-//pagination docker jwt

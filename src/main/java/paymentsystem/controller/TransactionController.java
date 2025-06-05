@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import paymentsystem.model.dto.TransactionDto;
-import paymentsystem.service.TransactionService;
+import paymentsystem.service.abstraction.TransactionService;
 
 import java.math.BigDecimal;
 
@@ -32,7 +32,7 @@ public class TransactionController {
         return transactionService.getAllTransactions(pageable);
     }
 
-    @GetMapping("/getTransactionsByCustomerId/{customerId}")
+    @GetMapping("/transactionsByCustomerId/{customerId}")
     public Page<TransactionDto> getTransactionsByCustomerId(@PathVariable Integer customerId,
                                                             @RequestParam(defaultValue = "0", required = false) Integer page,
                                                             @RequestParam(defaultValue = "10", required = false) Integer size

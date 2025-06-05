@@ -1,4 +1,4 @@
-package paymentsystem.service;
+package paymentsystem.service.concrete;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +17,10 @@ import paymentsystem.exception.exceptions.UserNotFoundException;
 import paymentsystem.mapper.UserMapper;
 import paymentsystem.model.dto.UserDto;
 import paymentsystem.model.entity.UserEntity;
+import paymentsystem.model.enums.UserRole;
 import paymentsystem.model.enums.UserStatus;
 import paymentsystem.repository.UserRepository;
+import paymentsystem.service.abstraction.UserService;
 
 import java.util.List;
 
@@ -35,7 +37,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsById(username))
             throw new UserAlreadyExistsException();
 
-        UserEntity userEntity = userMapper.buildUserEntity(username, password);
+        UserEntity userEntity = userMapper.buildUserEntity(username, password, UserRole.USER);
 
         userRepository.save(userEntity);
         log.info("User created " + username);
@@ -47,7 +49,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsById(username))
             throw new UserAlreadyExistsException();
 
-        UserEntity userEntity = userMapper.buildUserEntity(username, password);
+        UserEntity userEntity = userMapper.buildUserEntity(username, password, UserRole.ADMIN);
 
         userRepository.save(userEntity);
         log.info("User created " + username);
@@ -85,12 +87,13 @@ public class UserServiceImpl implements UserService {
         if (!userRepository.existsById(username))
             throw new UserNotFoundException();
 
-        if (oldPassword.equals(newPassword))
-            throw new PasswordsMatchException();
-
         UserEntity userEntity = userRepository.getReferenceById(username);
         if (!userEntity.getPassword().equals(oldPassword))
             throw new IncorrectPasswordException();
+
+        if (oldPassword.equals(newPassword))
+            throw new PasswordsMatchException();
+
 
         userEntity.setPassword(newPassword);
         userRepository.save(userEntity);
