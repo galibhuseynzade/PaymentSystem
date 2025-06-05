@@ -1,8 +1,8 @@
 package paymentsystem.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import paymentsystem.model.dto.UserDto;
-
-import java.util.List;
 
 public interface UserService {
     UserDto createGenericUser(String username, String password);
@@ -10,5 +10,5 @@ public interface UserService {
     void activateUser(String username);
     void disableUser(String username);
     void changePassword(String username, String oldPassword, String newPassword);
-    List<UserDto> getAllUsers();
+    Page<UserDto> getAllUsers(Pageable pageable);
 }

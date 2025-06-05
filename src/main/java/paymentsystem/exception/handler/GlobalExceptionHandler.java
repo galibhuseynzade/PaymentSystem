@@ -25,6 +25,7 @@ import paymentsystem.exception.exceptions.UserNotFoundException;
 import paymentsystem.exception.model.ResponseModel;
 
 import javax.naming.LimitExceededException;
+import java.sql.SQLException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -72,6 +73,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResponseModel> handleValidation(MethodArgumentNotValidException ex) {
         String message = ex.getBindingResult().getAllErrors().getFirst().getDefaultMessage();
         return buildResponse(message, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(SQLException.class)
+    public ResponseEntity<ResponseModel> handleSQL(SQLException ex) {
+        return buildResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
 

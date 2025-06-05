@@ -4,6 +4,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import paymentsystem.config.LimitConfiguration;
 import paymentsystem.exception.exceptions.AccountNotActiveException;
@@ -120,15 +123,17 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<TransactionDto> getTransactionsByCustomerId(Integer customerId) {
-        List<TransactionEntity> transactionEntities = transactionRepository.findByCustomerEntity_CustomerId(customerId);
-        return getTransactionDtoList(transactionEntities);
+    public Page<TransactionDto> getTransactionsByCustomerId(Integer customerId, Pageable pageable) {
+        Page<TransactionEntity> transactionEntityPage = transactionRepository.findByCustomerEntity_CustomerId(customerId, pageable);
+        List<TransactionDto> transactionDtoList = getTransactionDtoList(transactionEntityPage.getContent());
+        return new PageImpl<>(transactionDtoList, pageable, transactionEntityPage.getTotalElements());
     }
 
     @Override
-    public List<TransactionDto> getAllTransactions() {
-        List<TransactionEntity> transactionEntities = transactionRepository.findAll();
-        return getTransactionDtoList(transactionEntities);
+    public Page<TransactionDto> getAllTransactions(Pageable pageable) {
+        Page<TransactionEntity> transactionEntities = transactionRepository.findAll(pageable);
+        List<TransactionDto> transactionDtoList = getTransactionDtoList(transactionEntities.getContent());
+        return new PageImpl<>(transactionDtoList, pageable, transactionEntities.getTotalElements());
     }
 
     private TransactionDto getTransactionDto(TransactionEntity transactionEntity) {

@@ -1,10 +1,10 @@
 package paymentsystem.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import paymentsystem.model.dto.CustomerDto;
-
-import java.util.List;
 
 public interface CustomerService {
     CustomerDto createCustomer(CustomerDto customerDto);
-    List<CustomerDto> getAllCustomers();
+    Page<CustomerDto> getAllCustomers(Pageable pageable);
 }

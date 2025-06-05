@@ -4,6 +4,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import paymentsystem.config.LimitConfiguration;
 import paymentsystem.exception.exceptions.AccountNotFoundException;
@@ -39,7 +42,7 @@ public class AccountServiceImpl implements AccountService {
     public AccountDto createAccount(Integer customerId) {
         CustomerEntity customerEntity = customerRepository.findById(customerId).orElseThrow(CustomerNotFoundException::new);
 
-        if (accountRepository.findByCustomerEntity_CustomerIdAndStatusIn(customerId, validAccountStatusList).size() >= limitConfiguration.getMaxAccountCount())
+        if (accountRepository.countByCustomerEntity_CustomerIdAndStatusIn(customerId, validAccountStatusList) >= limitConfiguration.getMaxAccountCount())
             throw new MaximumAccountCountException(limitConfiguration.getMaxAccountCount());
 
         AccountEntity accountEntity = accountMapper.buildAccountEntity(customerEntity);
@@ -73,21 +76,24 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<AccountDto> getAccountsByCustomerId(Integer customerId) {
-        List<AccountEntity> accountEntityList = accountRepository.findByCustomerEntity_CustomerIdAndStatusIn(customerId, validAccountStatusList);
-        return getAccountDtoList(accountEntityList);
+    public Page<AccountDto> getAccountsByCustomerId(Integer customerId, Pageable pageable) {
+        Page<AccountEntity> accountEntityPage = accountRepository.findByCustomerEntity_CustomerIdAndStatusIn(customerId, validAccountStatusList, pageable);
+        List<AccountDto> accountDtoList = getAccountDtoList(accountEntityPage.getContent());
+        return new PageImpl<>(accountDtoList, accountEntityPage.getPageable(), accountEntityPage.getTotalElements());
     }
 
     @Override
-    public List<AccountDto> getAllActiveAccounts() {
-        List<AccountEntity> accountEntityList = accountRepository.findByStatus(AccountStatus.ACTIVE);
-        return getAccountDtoList(accountEntityList);
+    public Page<AccountDto> getAllActiveAccounts(Pageable pageable) {
+        Page<AccountEntity> accountEntityPage = accountRepository.findByStatus(AccountStatus.ACTIVE, pageable);
+        List<AccountDto> accountDtoList = getAccountDtoList(accountEntityPage.getContent());
+        return new PageImpl<>(accountDtoList, pageable, accountEntityPage.getTotalElements());
     }
 
     @Override
-    public List<AccountDto> getAllAccounts() {
-        List<AccountEntity> accountEntityList = accountRepository.findAll();
-        return getAccountDtoList(accountEntityList);
+    public Page<AccountDto> getAllAccounts(Pageable pageable) {
+        Page<AccountEntity> accountEntityPage = accountRepository.findAll(pageable);
+        List<AccountDto> accountDtoList = getAccountDtoList(accountEntityPage.getContent());
+        return new PageImpl<>(accountDtoList, pageable, accountEntityPage.getTotalElements());
     }
 
     private List<AccountDto> getAccountDtoList(List<AccountEntity> accountEntityList) {

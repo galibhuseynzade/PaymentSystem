@@ -3,6 +3,9 @@ package paymentsystem.controller;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,7 +17,6 @@ import paymentsystem.model.dto.CardDto;
 import paymentsystem.service.CardService;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/card")
@@ -24,18 +26,28 @@ public class CardController {
     CardService cardService;
 
     @GetMapping
-    public List<CardDto> getAllCards() {
-        return cardService.getAllCards();
+    public Page<CardDto> getAllCards(@RequestParam(defaultValue = "0", required = false) Integer page,
+                                     @RequestParam(defaultValue = "10", required = false) Integer size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return cardService.getAllCards(pageable);
     }
 
     @GetMapping("/getAllActiveCards")
-    public List<CardDto> getAllActiveCards() {
-        return cardService.getAllActiveCards();
+    public Page<CardDto> getAllActiveCards(@RequestParam(defaultValue = "0", required = false) Integer page,
+                                           @RequestParam(defaultValue = "10", required = false) Integer size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return cardService.getAllActiveCards(pageable);
     }
 
     @GetMapping("/getCardsByCustomerId/{customerId}")
-    public List<CardDto> getCardsByCustomerId(@PathVariable Integer customerId) {
-        return cardService.getCardsByCustomerId(customerId);
+    public Page<CardDto> getCardsByCustomerId(@PathVariable Integer customerId,
+                                              @RequestParam(defaultValue = "0", required = false) Integer page,
+                                              @RequestParam(defaultValue = "10", required = false) Integer size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return cardService.getCardsByCustomerId(customerId, pageable);
     }
 
     @PostMapping("/createCard")

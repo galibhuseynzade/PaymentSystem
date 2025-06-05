@@ -1,12 +1,13 @@
 package paymentsystem.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import paymentsystem.model.dto.TransactionDto;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 public interface TransactionService {
     TransactionDto transfer(String debit, String credit, BigDecimal amount);
-    List<TransactionDto> getTransactionsByCustomerId(Integer customerId);
-    List<TransactionDto> getAllTransactions();
+    Page<TransactionDto> getTransactionsByCustomerId(Integer customerId, Pageable pageable);
+    Page<TransactionDto> getAllTransactions(Pageable pageable);
 }

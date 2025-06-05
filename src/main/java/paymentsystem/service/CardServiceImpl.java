@@ -4,6 +4,9 @@
     import lombok.RequiredArgsConstructor;
     import lombok.experimental.FieldDefaults;
     import lombok.extern.slf4j.Slf4j;
+    import org.springframework.data.domain.Page;
+    import org.springframework.data.domain.PageImpl;
+    import org.springframework.data.domain.Pageable;
     import org.springframework.stereotype.Service;
     import paymentsystem.config.LimitConfiguration;
     import paymentsystem.exception.exceptions.CardNotFoundException;
@@ -39,7 +42,7 @@
         public CardDto createCard(Integer customerId) {
             CustomerEntity customerEntity = customerRepository.findById(customerId).orElseThrow(CustomerNotFoundException::new);
 
-            if (cardRepository.findByCustomerEntity_CustomerIdAndStatusIn(customerId, validAccountStatusList).size() >= limitConfiguration.getMaxCardCount())
+            if (cardRepository.countByCustomerEntity_CustomerIdAndStatusIn(customerId, validAccountStatusList) >= limitConfiguration.getMaxCardCount())
                 throw new MaximumCardCoundException(limitConfiguration.getMaxCardCount());
 
             CardEntity cardEntity = cardMapper.buildCardEntity(customerEntity);
@@ -73,21 +76,24 @@
         }
 
         @Override
-        public List<CardDto> getCardsByCustomerId(Integer customerId) {
-            List<CardEntity> cardEntityList = cardRepository.findByCustomerEntity_CustomerIdAndStatusIn(customerId, validAccountStatusList);
-            return getCardDtoList(cardEntityList);
+        public Page<CardDto> getCardsByCustomerId(Integer customerId, Pageable pageable) {
+            Page<CardEntity> cardEntityPage = cardRepository.findByCustomerEntity_CustomerIdAndStatusIn(customerId, validAccountStatusList, pageable);
+            List<CardDto> cardDtoList = getCardDtoList(cardEntityPage.getContent());
+            return new PageImpl<>(cardDtoList, pageable, cardEntityPage.getTotalElements());
         }
 
         @Override
-        public List<CardDto> getAllActiveCards() {
-            List<CardEntity> cardEntityList = cardRepository.findByStatus(CardStatus.ACTIVE);
-            return getCardDtoList(cardEntityList);
+        public Page<CardDto> getAllActiveCards(Pageable pageable) {
+            Page<CardEntity> cardEntityPage = cardRepository.findByStatus(CardStatus.ACTIVE, pageable);
+            List<CardDto> cardDtoList = getCardDtoList(cardEntityPage.getContent());
+            return new PageImpl<>(cardDtoList, pageable, cardEntityPage.getTotalElements());
         }
 
         @Override
-        public List<CardDto> getAllCards() {
-            List<CardEntity> cardEntityList = cardRepository.findAll();
-            return getCardDtoList(cardEntityList);
+        public Page<CardDto> getAllCards(Pageable pageable) {
+            Page<CardEntity> cardEntityPage = cardRepository.findAll(pageable);
+            List<CardDto> cardDtoList = getCardDtoList(cardEntityPage.getContent());
+            return new PageImpl<>(cardDtoList, pageable, cardEntityPage.getTotalElements());
         }
 
         private List<CardDto> getCardDtoList(List<CardEntity> cardEntityList) {

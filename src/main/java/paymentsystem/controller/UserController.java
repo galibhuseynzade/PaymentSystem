@@ -3,6 +3,9 @@ package paymentsystem.controller;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -12,8 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import paymentsystem.model.dto.UserDto;
 import paymentsystem.service.UserService;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
@@ -22,8 +23,11 @@ public class UserController {
     UserService userService;
 
     @GetMapping
-    public List<UserDto> getAllUsers() {
-        return userService.getAllUsers();
+    public Page<UserDto> getAllUsers(@RequestParam(defaultValue = "0", required = false) Integer page,
+                                     @RequestParam(defaultValue = "10", required = false) Integer size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return userService.getAllUsers(pageable);
     }
 
     @PostMapping("/createGenericUser")
