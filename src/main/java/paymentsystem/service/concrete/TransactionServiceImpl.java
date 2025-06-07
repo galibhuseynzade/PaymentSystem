@@ -1,11 +1,15 @@
-package paymentsystem.service;
+package paymentsystem.service.concrete;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import paymentsystem.config.LimitConfiguration;
+import paymentsystem.config.LimitProperties;
 import paymentsystem.exception.exceptions.AccountNotActiveException;
 import paymentsystem.exception.exceptions.CardNotFoundException;
 import paymentsystem.exception.exceptions.LimitExceedsException;
@@ -21,10 +25,10 @@ import paymentsystem.model.enums.CardStatus;
 import paymentsystem.repository.AccountRepository;
 import paymentsystem.repository.CardRepository;
 import paymentsystem.repository.TransactionRepository;
+import paymentsystem.service.abstraction.TransactionService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -36,7 +40,7 @@ public class TransactionServiceImpl implements TransactionService {
     TransactionMapper transactionMapper;
     AccountRepository accountRepository;
     CardRepository cardRepository;
-    LimitConfiguration limitConfiguration;
+    LimitProperties limitProperties;
 
     @Override
     public TransactionDto transfer(String debit, String credit, BigDecimal amount) {
@@ -51,7 +55,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private TransactionDto transferFromAccount(String debit, String credit, BigDecimal amount) {
-        AccountEntity accountEntity = accountRepository.findById(debit).orElseThrow();
+        AccountEntity accountEntity = accountRepository.findById(debit).orElseThrow(AccountNotActiveException::new);
 
         if (!accountEntity.getStatus().equals(AccountStatus.ACTIVE))
             throw new AccountNotActiveException();
@@ -62,7 +66,7 @@ public class TransactionServiceImpl implements TransactionService {
         if (accountEntity.getBalance().compareTo(amount) < 0)
             throw new NotEnoughFundsException();
 
-        if (accountEntity.getBalance().compareTo(limitConfiguration.getMinAcceptableAccountBalance()) < 0)
+        if (accountEntity.getBalance().compareTo(limitProperties.getMinAcceptableAccountBalance()) < 0)
             throw new LimitExceedsException();
 
         return createTransaction(customerEntity, debit, credit, amount);
@@ -74,7 +78,7 @@ public class TransactionServiceImpl implements TransactionService {
         CustomerEntity customerEntity = cardEntity.getCustomerEntity();
         checkCustomerTransactions(customerEntity);
 
-        if (cardEntity.getBalance().compareTo(limitConfiguration.getMinAcceptableCardBalance()) >= 0
+        if (cardEntity.getBalance().compareTo(limitProperties.getMinAcceptableCardBalance()) >= 0
                 && cardEntity.getBalance().compareTo(amount) >= 0
                 && cardEntity.getStatus().equals(CardStatus.ACTIVE)) {
             return createTransaction(customerEntity, debit, credit, amount);
@@ -116,32 +120,22 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionEntity transactionEntity = transactionMapper.buildTransactionEntity(customerEntity, debit, credit, amount);
 
         transactionRepository.save(transactionEntity);
-        return getTransactionDto(transactionEntity);
+        return transactionMapper.getTransactionDto(transactionEntity);
     }
 
     @Override
-    public List<TransactionDto> getTransactionsByCustomerId(Integer customerId) {
-        List<TransactionEntity> transactionEntities = transactionRepository.findByCustomerEntity_CustomerId(customerId);
-        return getTransactionDtoList(transactionEntities);
+    public Page<TransactionDto> getTransactionsByCustomerId(Integer customerId, Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<TransactionEntity> transactionEntityPage = transactionRepository.findByCustomerEntity_CustomerId(customerId, pageable);
+        List<TransactionDto> transactionDtoList = transactionMapper.getTransactionDtoList(transactionEntityPage.getContent());
+        return new PageImpl<>(transactionDtoList, pageable, transactionEntityPage.getTotalElements());
     }
 
     @Override
-    public List<TransactionDto> getAllTransactions() {
-        List<TransactionEntity> transactionEntities = transactionRepository.findAll();
-        return getTransactionDtoList(transactionEntities);
-    }
-
-    private TransactionDto getTransactionDto(TransactionEntity transactionEntity) {
-        TransactionDto transactionDto = transactionMapper.mapToTransactionDto(transactionEntity);
-        transactionDto.setCustomerId(transactionEntity.getCustomerEntity().getCustomerId());
-        return transactionDto;
-    }
-
-    private List<TransactionDto> getTransactionDtoList(List<TransactionEntity> transactionEntities) {
-        List<TransactionDto> transactionDtoList = new ArrayList<>();
-        for (TransactionEntity transactionEntity : transactionEntities) {
-            transactionDtoList.add(getTransactionDto(transactionEntity));
-        }
-        return transactionDtoList;
+    public Page<TransactionDto> getAllTransactions(Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<TransactionEntity> transactionEntities = transactionRepository.findAll(pageable);
+        List<TransactionDto> transactionDtoList = transactionMapper.getTransactionDtoList(transactionEntities.getContent());
+        return new PageImpl<>(transactionDtoList, pageable, transactionEntities.getTotalElements());
     }
 }

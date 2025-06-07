@@ -1,19 +1,23 @@
-package paymentsystem.service;
+package paymentsystem.service.concrete;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import paymentsystem.mapper.CustomerMapper;
 import paymentsystem.model.dto.CustomerDto;
 import paymentsystem.model.entity.CustomerEntity;
 import paymentsystem.model.enums.CustomerStatus;
 import paymentsystem.repository.CustomerRepository;
+import paymentsystem.service.abstraction.CustomerService;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -34,7 +38,10 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<CustomerDto> getAllCustomers() {
-        return customerRepository.findAll().stream().map(customerMapper::mapToCustomerDto).collect(Collectors.toList());
+    public Page<CustomerDto> getAllCustomers(Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CustomerEntity> customerEntityPage = customerRepository.findAll(pageable);
+        List<CustomerDto> customerDtoList = customerEntityPage.getContent().stream().map(customerMapper::mapToCustomerDto).toList();
+        return new PageImpl<>(customerDtoList, pageable, customerEntityPage.getTotalElements());
     }
 }
