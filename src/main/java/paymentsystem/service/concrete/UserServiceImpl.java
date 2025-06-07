@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import paymentsystem.exception.exceptions.IncorrectPasswordException;
@@ -100,7 +101,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserDto> getAllUsers(Pageable pageable) {
+    public Page<UserDto> getAllUsers(Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<UserEntity> userEntityPage = userRepository.findByStatus(UserStatus.ACTIVE, pageable);
         List<UserDto> userDtoList = userEntityPage.getContent().stream().map(userMapper::mapToUserDto).toList();
         return new PageImpl<>(userDtoList, pageable, userEntityPage.getTotalElements());

@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import paymentsystem.config.LimitProperties;
@@ -124,14 +125,16 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Page<TransactionDto> getTransactionsByCustomerId(Integer customerId, Pageable pageable) {
+    public Page<TransactionDto> getTransactionsByCustomerId(Integer customerId, Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<TransactionEntity> transactionEntityPage = transactionRepository.findByCustomerEntity_CustomerId(customerId, pageable);
         List<TransactionDto> transactionDtoList = getTransactionDtoList(transactionEntityPage.getContent());
         return new PageImpl<>(transactionDtoList, pageable, transactionEntityPage.getTotalElements());
     }
 
     @Override
-    public Page<TransactionDto> getAllTransactions(Pageable pageable) {
+    public Page<TransactionDto> getAllTransactions(Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<TransactionEntity> transactionEntities = transactionRepository.findAll(pageable);
         List<TransactionDto> transactionDtoList = getTransactionDtoList(transactionEntities.getContent());
         return new PageImpl<>(transactionDtoList, pageable, transactionEntities.getTotalElements());

@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import paymentsystem.config.LimitProperties;
@@ -77,21 +78,24 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Page<AccountDto> getAccountsByCustomerId(Integer customerId, Pageable pageable) {
+    public Page<AccountDto> getAccountsByCustomerId(Integer customerId, Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<AccountEntity> accountEntityPage = accountRepository.findByCustomerEntity_CustomerIdAndStatusIn(customerId, validAccountStatusList, pageable);
         List<AccountDto> accountDtoList = getAccountDtoList(accountEntityPage.getContent());
         return new PageImpl<>(accountDtoList, accountEntityPage.getPageable(), accountEntityPage.getTotalElements());
     }
 
     @Override
-    public Page<AccountDto> getAllActiveAccounts(Pageable pageable) {
+    public Page<AccountDto> getAllActiveAccounts(Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<AccountEntity> accountEntityPage = accountRepository.findByStatus(AccountStatus.ACTIVE, pageable);
         List<AccountDto> accountDtoList = getAccountDtoList(accountEntityPage.getContent());
         return new PageImpl<>(accountDtoList, pageable, accountEntityPage.getTotalElements());
     }
 
     @Override
-    public Page<AccountDto> getAllAccounts(Pageable pageable) {
+    public Page<AccountDto> getAllAccounts(Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<AccountEntity> accountEntityPage = accountRepository.findAll(pageable);
         List<AccountDto> accountDtoList = getAccountDtoList(accountEntityPage.getContent());
         return new PageImpl<>(accountDtoList, pageable, accountEntityPage.getTotalElements());

@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import paymentsystem.mapper.CustomerMapper;
@@ -37,7 +38,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Page<CustomerDto> getAllCustomers(Pageable pageable) {
+    public Page<CustomerDto> getAllCustomers(Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<CustomerEntity> customerEntityPage = customerRepository.findAll(pageable);
         List<CustomerDto> customerDtoList = customerEntityPage.getContent().stream().map(customerMapper::mapToCustomerDto).toList();
         return new PageImpl<>(customerDtoList, pageable, customerEntityPage.getTotalElements());

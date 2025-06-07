@@ -4,8 +4,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,8 +26,7 @@ public class TransactionController {
     public Page<TransactionDto> getAllTransactions(@RequestParam(defaultValue = "0", required = false) Integer page,
                                                    @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
-        Pageable pageable = PageRequest.of(page, size);
-        return transactionService.getAllTransactions(pageable);
+        return transactionService.getAllTransactions(page, size);
     }
 
     @GetMapping("/transactionsByCustomerId/{customerId}")
@@ -37,8 +34,7 @@ public class TransactionController {
                                                             @RequestParam(defaultValue = "0", required = false) Integer page,
                                                             @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
-        Pageable pageable = PageRequest.of(page, size);
-        return transactionService.getTransactionsByCustomerId(customerId, pageable);
+        return transactionService.getTransactionsByCustomerId(customerId, page, size);
     }
 
     @PostMapping("/transfer")

@@ -4,8 +4,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,16 +27,14 @@ public class AccountController {
     public Page<AccountDto> getAllAccounts(@RequestParam(defaultValue = "0", required = false) Integer page,
                                            @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
-        Pageable pageable = PageRequest.of(page, size);
-        return accountService.getAllAccounts(pageable);
+        return accountService.getAllAccounts(page, size);
     }
 
     @GetMapping("/allActiveAccounts")
     public Page<AccountDto> getAllActiveAccounts(@RequestParam(defaultValue = "0", required = false) Integer page,
                                                  @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
-        Pageable pageable = PageRequest.of(page, size);
-        return accountService.getAllActiveAccounts(pageable);
+        return accountService.getAllActiveAccounts(page, size);
     }
 
     @GetMapping("/accountsByCustomerId/{customerId}")
@@ -46,8 +42,7 @@ public class AccountController {
                                                     @RequestParam(defaultValue = "0", required = false) Integer page,
                                                     @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
-        Pageable pageable = PageRequest.of(page, size);
-        return accountService.getAccountsByCustomerId(customerId, pageable);
+        return accountService.getAccountsByCustomerId(customerId, page, size);
     }
 
     @PostMapping("/{customerId}")
