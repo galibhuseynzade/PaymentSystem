@@ -8,11 +8,12 @@ import paymentsystem.model.enums.CardStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 @Mapper(componentModel = "spring")
 public interface CardMapper {
-    CardEntity mapToCardEntity(CardDto cardDto);
     CardDto mapToCardDto(CardEntity cardEntity);
 
     default CardEntity buildCardEntity(CustomerEntity customerEntity) {
@@ -39,4 +40,17 @@ public interface CardMapper {
         return stringBuilder.toString();
     }
 
+    default List<CardDto> getCardDtoList(List<CardEntity> cardEntityList) {
+        List<CardDto> cardDtoList = new ArrayList<>();
+        for (CardEntity cardEntity : cardEntityList) {
+            cardDtoList.add(getCardDto(cardEntity));
+        }
+        return cardDtoList;
+    }
+
+    default CardDto getCardDto(CardEntity cardEntity) {
+        CardDto cardDto = mapToCardDto(cardEntity);
+        cardDto.setCustomerId(cardEntity.getCustomerEntity().getCustomerId());
+        return cardDto;
+    }
 }

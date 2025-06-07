@@ -8,6 +8,8 @@ import paymentsystem.model.enums.AccountStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 @Mapper(componentModel = "spring")
@@ -36,4 +38,17 @@ public interface AccountMapper {
         return stringBuilder.toString();
     }
 
+    default List<AccountDto> getAccountDtoList(List<AccountEntity> accountEntityList) {
+        List<AccountDto> accountDtoList = new ArrayList<>();
+        for (AccountEntity accountEntity : accountEntityList) {
+            accountDtoList.add(getAccountDto(accountEntity));
+        }
+        return accountDtoList;
+    }
+
+    default AccountDto getAccountDto(AccountEntity accountEntity) {
+        AccountDto accountDto = mapToAccountDto(accountEntity);
+        accountDto.setCustomerId(accountEntity.getCustomerEntity().getCustomerId());
+        return accountDto;
+    }
 }

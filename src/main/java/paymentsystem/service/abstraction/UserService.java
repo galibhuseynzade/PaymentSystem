@@ -1,8 +1,7 @@
-package paymentsystem.service;
+package paymentsystem.service.abstraction;
 
+import org.springframework.data.domain.Page;
 import paymentsystem.model.dto.UserDto;
-
-import java.util.List;
 
 public interface UserService {
     UserDto createGenericUser(String username, String password);
@@ -10,5 +9,5 @@ public interface UserService {
     void activateUser(String username);
     void disableUser(String username);
     void changePassword(String username, String oldPassword, String newPassword);
-    List<UserDto> getAllUsers();
+    Page<UserDto> getAllUsers(Integer page, Integer size);
 }

@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import paymentsystem.config.LimitConfiguration;
+import paymentsystem.config.LimitProperties;
 import paymentsystem.exception.exceptions.AccountNotFoundException;
 import paymentsystem.exception.exceptions.CardNotFoundException;
 import paymentsystem.model.entity.AccountEntity;
@@ -34,7 +34,7 @@ public class TransactionSchedule {
     AccountRepository accountRepository;
     CardRepository cardRepository;
     CustomerRepository customerRepository;
-    LimitConfiguration limitConfiguration;
+    LimitProperties limitProperties;
 
     //    @Scheduled(cron = "0 0 0 * * *")
     @Scheduled(fixedRate = 30000)
@@ -55,7 +55,7 @@ public class TransactionSchedule {
     private void checkCustomerStatus(CustomerEntity customerEntity) {
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusMonths(1);
-        if (transactionRepository.getMonthlyTotalByCustomer(customerEntity.getCustomerId(), startDate, endDate).compareTo(limitConfiguration.getDailyTransactionLimit()) > 0) {
+        if (transactionRepository.getMonthlyTotalByCustomer(customerEntity.getCustomerId(), startDate, endDate).compareTo(limitProperties.getDailyTransactionLimit()) > 0) {
             customerEntity.setStatus(CustomerStatus.SUSPECTED);
             customerRepository.save(customerEntity);
         }
