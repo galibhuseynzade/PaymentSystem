@@ -29,7 +29,6 @@ import paymentsystem.service.abstraction.TransactionService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -121,14 +120,14 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionEntity transactionEntity = transactionMapper.buildTransactionEntity(customerEntity, debit, credit, amount);
 
         transactionRepository.save(transactionEntity);
-        return getTransactionDto(transactionEntity);
+        return transactionMapper.getTransactionDto(transactionEntity);
     }
 
     @Override
     public Page<TransactionDto> getTransactionsByCustomerId(Integer customerId, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<TransactionEntity> transactionEntityPage = transactionRepository.findByCustomerEntity_CustomerId(customerId, pageable);
-        List<TransactionDto> transactionDtoList = getTransactionDtoList(transactionEntityPage.getContent());
+        List<TransactionDto> transactionDtoList = transactionMapper.getTransactionDtoList(transactionEntityPage.getContent());
         return new PageImpl<>(transactionDtoList, pageable, transactionEntityPage.getTotalElements());
     }
 
@@ -136,21 +135,7 @@ public class TransactionServiceImpl implements TransactionService {
     public Page<TransactionDto> getAllTransactions(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<TransactionEntity> transactionEntities = transactionRepository.findAll(pageable);
-        List<TransactionDto> transactionDtoList = getTransactionDtoList(transactionEntities.getContent());
+        List<TransactionDto> transactionDtoList = transactionMapper.getTransactionDtoList(transactionEntities.getContent());
         return new PageImpl<>(transactionDtoList, pageable, transactionEntities.getTotalElements());
-    }
-
-    private TransactionDto getTransactionDto(TransactionEntity transactionEntity) {
-        TransactionDto transactionDto = transactionMapper.mapToTransactionDto(transactionEntity);
-        transactionDto.setCustomerId(transactionEntity.getCustomerEntity().getCustomerId());
-        return transactionDto;
-    }
-
-    private List<TransactionDto> getTransactionDtoList(List<TransactionEntity> transactionEntities) {
-        List<TransactionDto> transactionDtoList = new ArrayList<>();
-        for (TransactionEntity transactionEntity : transactionEntities) {
-            transactionDtoList.add(getTransactionDto(transactionEntity));
-        }
-        return transactionDtoList;
     }
 }

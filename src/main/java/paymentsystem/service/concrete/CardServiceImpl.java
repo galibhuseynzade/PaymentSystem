@@ -25,7 +25,6 @@ import paymentsystem.repository.CustomerRepository;
 import paymentsystem.service.abstraction.CardService;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,7 +50,7 @@ public class CardServiceImpl implements CardService {
 
         cardRepository.save(cardEntity);
         log.info("Card created");
-        return getCardDto(cardEntity);
+        return cardMapper.getCardDto(cardEntity);
     }
 
     @Override
@@ -81,7 +80,7 @@ public class CardServiceImpl implements CardService {
     public Page<CardDto> getCardsByCustomerId(Integer customerId, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<CardEntity> cardEntityPage = cardRepository.findByCustomerEntity_CustomerIdAndStatusIn(customerId, validAccountStatusList, pageable);
-        List<CardDto> cardDtoList = getCardDtoList(cardEntityPage.getContent());
+        List<CardDto> cardDtoList = cardMapper.getCardDtoList(cardEntityPage.getContent());
         return new PageImpl<>(cardDtoList, pageable, cardEntityPage.getTotalElements());
     }
 
@@ -89,7 +88,7 @@ public class CardServiceImpl implements CardService {
     public Page<CardDto> getAllActiveCards(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<CardEntity> cardEntityPage = cardRepository.findByStatus(CardStatus.ACTIVE, pageable);
-        List<CardDto> cardDtoList = getCardDtoList(cardEntityPage.getContent());
+        List<CardDto> cardDtoList = cardMapper.getCardDtoList(cardEntityPage.getContent());
         return new PageImpl<>(cardDtoList, pageable, cardEntityPage.getTotalElements());
     }
 
@@ -97,21 +96,7 @@ public class CardServiceImpl implements CardService {
     public Page<CardDto> getAllCards(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<CardEntity> cardEntityPage = cardRepository.findAll(pageable);
-        List<CardDto> cardDtoList = getCardDtoList(cardEntityPage.getContent());
+        List<CardDto> cardDtoList = cardMapper.getCardDtoList(cardEntityPage.getContent());
         return new PageImpl<>(cardDtoList, pageable, cardEntityPage.getTotalElements());
-    }
-
-    private List<CardDto> getCardDtoList(List<CardEntity> cardEntityList) {
-        List<CardDto> cardDtoList = new ArrayList<>();
-        for (CardEntity cardEntity : cardEntityList) {
-            cardDtoList.add(getCardDto(cardEntity));
-        }
-        return cardDtoList;
-    }
-
-    private CardDto getCardDto(CardEntity cardEntity) {
-        CardDto cardDto = cardMapper.mapToCardDto(cardEntity);
-        cardDto.setCustomerId(cardEntity.getCustomerEntity().getCustomerId());
-        return cardDto;
     }
 }

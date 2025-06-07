@@ -25,7 +25,6 @@ import paymentsystem.repository.CustomerRepository;
 import paymentsystem.service.abstraction.AccountService;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,7 +50,7 @@ public class AccountServiceImpl implements AccountService {
 
         accountRepository.save(accountEntity);
         log.info("Account created");
-        return getAccountDto(accountEntity);
+        return accountMapper.getAccountDto(accountEntity);
     }
 
     @Override
@@ -81,7 +80,7 @@ public class AccountServiceImpl implements AccountService {
     public Page<AccountDto> getAccountsByCustomerId(Integer customerId, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<AccountEntity> accountEntityPage = accountRepository.findByCustomerEntity_CustomerIdAndStatusIn(customerId, validAccountStatusList, pageable);
-        List<AccountDto> accountDtoList = getAccountDtoList(accountEntityPage.getContent());
+        List<AccountDto> accountDtoList = accountMapper.getAccountDtoList(accountEntityPage.getContent());
         return new PageImpl<>(accountDtoList, accountEntityPage.getPageable(), accountEntityPage.getTotalElements());
     }
 
@@ -89,7 +88,7 @@ public class AccountServiceImpl implements AccountService {
     public Page<AccountDto> getAllActiveAccounts(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<AccountEntity> accountEntityPage = accountRepository.findByStatus(AccountStatus.ACTIVE, pageable);
-        List<AccountDto> accountDtoList = getAccountDtoList(accountEntityPage.getContent());
+        List<AccountDto> accountDtoList = accountMapper.getAccountDtoList(accountEntityPage.getContent());
         return new PageImpl<>(accountDtoList, pageable, accountEntityPage.getTotalElements());
     }
 
@@ -97,21 +96,7 @@ public class AccountServiceImpl implements AccountService {
     public Page<AccountDto> getAllAccounts(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<AccountEntity> accountEntityPage = accountRepository.findAll(pageable);
-        List<AccountDto> accountDtoList = getAccountDtoList(accountEntityPage.getContent());
+        List<AccountDto> accountDtoList = accountMapper.getAccountDtoList(accountEntityPage.getContent());
         return new PageImpl<>(accountDtoList, pageable, accountEntityPage.getTotalElements());
-    }
-
-    private List<AccountDto> getAccountDtoList(List<AccountEntity> accountEntityList) {
-        List<AccountDto> accountDtoList = new ArrayList<>();
-        for (AccountEntity accountEntity : accountEntityList) {
-            accountDtoList.add(getAccountDto(accountEntity));
-        }
-        return accountDtoList;
-    }
-
-    private AccountDto getAccountDto(AccountEntity accountEntity) {
-        AccountDto accountDto = accountMapper.mapToAccountDto(accountEntity);
-        accountDto.setCustomerId(accountEntity.getCustomerEntity().getCustomerId());
-        return accountDto;
     }
 }

@@ -8,6 +8,8 @@ import paymentsystem.model.enums.TransactionStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 @Mapper(componentModel = "spring")
@@ -33,5 +35,19 @@ public interface TransactionMapper {
             stringBuilder.append(random.nextInt(10));
         }
         return stringBuilder.toString();
+    }
+
+    default TransactionDto getTransactionDto(TransactionEntity transactionEntity) {
+        TransactionDto transactionDto = mapToTransactionDto(transactionEntity);
+        transactionDto.setCustomerId(transactionEntity.getCustomerEntity().getCustomerId());
+        return transactionDto;
+    }
+
+    default List<TransactionDto> getTransactionDtoList(List<TransactionEntity> transactionEntities) {
+        List<TransactionDto> transactionDtoList = new ArrayList<>();
+        for (TransactionEntity transactionEntity : transactionEntities) {
+            transactionDtoList.add(getTransactionDto(transactionEntity));
+        }
+        return transactionDtoList;
     }
 }
