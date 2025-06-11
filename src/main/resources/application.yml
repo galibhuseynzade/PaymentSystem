@@ -8,7 +8,6 @@ spring:
     password: P@ssw0rd
     driver-class-name: org.postgresql.Driver
 
-
   jpa:
     hibernate:
       ddl-auto: none
@@ -39,8 +38,6 @@ logging:
     liquibase: info
     org.postgresql: warn
 
-
-
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -53,3 +50,8 @@ limits:
   dailyTransactionLimit: 100
   minAcceptableAccountBalance: 5
   minAcceptableCardBalance: 10
+
+defaults:
+  accountLength: 20
+  cardLength: 16
+  monthlyPeriod: 1

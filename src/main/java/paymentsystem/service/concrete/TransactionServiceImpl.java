@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import paymentsystem.config.DefaultProperties;
 import paymentsystem.config.LimitProperties;
 import paymentsystem.exception.exceptions.AccountNotActiveException;
 import paymentsystem.exception.exceptions.CardNotFoundException;
@@ -41,14 +42,15 @@ public class TransactionServiceImpl implements TransactionService {
     AccountRepository accountRepository;
     CardRepository cardRepository;
     LimitProperties limitProperties;
+    DefaultProperties defaultProperties;
 
     @Override
     public TransactionDto transfer(String debit, String credit, BigDecimal amount) {
         checkCreditNumber(credit);
 
-        if (debit.length() == 16) {
+        if (debit.length() == defaultProperties.getDefaultCardLength()) {
             return transferFromCard(debit, credit, amount);
-        } else if (debit.length() == 20) {
+        } else if (debit.length() == defaultProperties.getDefaultAccountLength()) {
             return transferFromAccount(debit, credit, amount);
         } else
             throw new IllegalArgumentException("Wrong input for debit");
@@ -110,7 +112,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private void checkCreditNumber(String credit) {
-        if (credit.length() != 20 && credit.length() != 16)
+        if (credit.length() != defaultProperties.getDefaultAccountLength() && credit.length() != defaultProperties.getDefaultCardLength())
             throw new IllegalArgumentException("Wrong input for credit");
     }
 
