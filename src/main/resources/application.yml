@@ -55,3 +55,7 @@ defaults:
   accountLength: 20
   cardLength: 16
   monthlyPeriod: 1
+
+jwt:
+  expirationInMinutes: 30
+  secret: my-secret-key-for-jwt
