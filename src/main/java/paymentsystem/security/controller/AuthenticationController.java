@@ -4,14 +4,15 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import paymentsystem.security.dto.AuthenticationRequest;
+import paymentsystem.exception.exceptions.IncorrectPasswordException;
+import paymentsystem.exception.exceptions.UserNotFoundException;
+import paymentsystem.model.entity.UserEntity;
+import paymentsystem.repository.UserRepository;
 import paymentsystem.security.dto.AuthenticationResponse;
 import paymentsystem.security.jwt.JwtUtil;
 
@@ -20,27 +21,17 @@ import paymentsystem.security.jwt.JwtUtil;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationController {
-    AuthenticationManager authenticationManager;
     JwtUtil jwtUtil;
+    UserRepository userRepository;
+    PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(@RequestParam String username, @RequestParam String password) {
-        AuthenticationRequest authenticationRequest = new AuthenticationRequest();
-        authenticationRequest.setUsername(username);
-        authenticationRequest.setPassword(password);
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            authenticationRequest.getUsername(),
-                            authenticationRequest.getPassword()
-                    )
-            );
+        UserEntity userEntity = userRepository.findById(username).orElseThrow(UserNotFoundException::new);
+        if (!passwordEncoder.matches(password, userEntity.getPassword())) throw new IncorrectPasswordException();
 
-            String token = jwtUtil.generateToken(authenticationRequest.getUsername());
+        String token = jwtUtil.generateToken(username);
 
-            return ResponseEntity.ok(new AuthenticationResponse(token));
-        } catch (AuthenticationException ex) {
-            return ResponseEntity.status(401).build();
-        }
+        return ResponseEntity.ok(new AuthenticationResponse(token));
     }
 }

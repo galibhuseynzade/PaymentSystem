@@ -1,6 +1,5 @@
 package paymentsystem.security.jwt;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -24,35 +23,31 @@ public class JwtUtil {
     }
 
     public String generateToken(String username) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtProperties.getExpirationInMinutes() * 60 * 1000);
-
         return Jwts.builder()
                 .setSubject(username)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getExpirationInMinutes() * 60 * 1000))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    private Claims getClaimsFromToken(String token) {
+    public String getUsernameFromToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
-                .getBody();
+                .getBody()
+                .getSubject();
     }
 
-    public String getUsernameFromToken(String token) {
-        return getClaimsFromToken(token).getSubject();
-    }
-
-    public Boolean isTokenExpired(String token) {
-        return getClaimsFromToken(token).getExpiration().before(new Date());
-    }
-
-    public Boolean isTokenValid(String token, String username) {
-        String usernameFromToken = getUsernameFromToken(token);
-        return usernameFromToken.equals(username) && !isTokenExpired(token);
+    public boolean isTokenValid(String token, String username) {
+        return getUsernameFromToken(token).equals(username) &&
+                !Jwts.parserBuilder()
+                        .setSigningKey(getSigningKey())
+                        .build()
+                        .parseClaimsJws(token)
+                        .getBody()
+                        .getExpiration()
+                        .before(new Date());
     }
 }

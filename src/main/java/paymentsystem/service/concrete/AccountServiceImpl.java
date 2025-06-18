@@ -54,7 +54,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void activateAccount(String accountNumber) {
+    public Boolean activateAccount(String accountNumber) {
         AccountEntity accountEntity = accountRepository.findById(accountNumber).orElseThrow(AccountNotFoundException::new);
 
         if (!accountEntity.getStatus().equals(AccountStatus.NEW))
@@ -63,10 +63,11 @@ public class AccountServiceImpl implements AccountService {
         accountEntity.setStatus(AccountStatus.ACTIVE);
         accountRepository.save(accountEntity);
         log.info("Account activated " + accountNumber);
+        return true;
     }
 
     @Override
-    public void depositAccount(String accountNumber, BigDecimal amount) {
+    public Boolean depositAccount(String accountNumber, BigDecimal amount) {
         AccountEntity accountEntity = accountRepository.findById(accountNumber).orElseThrow(AccountNotFoundException::new);
         if (!accountEntity.getStatus().equals(AccountStatus.ACTIVE))
             throw new InactiveAccountDepositException();
@@ -74,6 +75,7 @@ public class AccountServiceImpl implements AccountService {
         BigDecimal newBalance = accountEntity.getBalance().add(amount);
         accountEntity.setBalance(newBalance);
         accountRepository.save(accountEntity);
+        return true;
     }
 
     @Override

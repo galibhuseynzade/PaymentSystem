@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void activateUser(String username) {
+    public Boolean activateUser(String username) {
         if (!userRepository.existsById(username))
             throw new UserNotFoundException();
 
@@ -72,10 +72,11 @@ public class UserServiceImpl implements UserService {
 
         userEntity.setStatus(UserStatus.ACTIVE);
         userRepository.save(userEntity);
+        return true;
     }
 
     @Override
-    public void disableUser(String username) {
+    public Boolean disableUser(String username) {
         if (!userRepository.existsById(username))
             throw new UserNotFoundException();
 
@@ -85,10 +86,11 @@ public class UserServiceImpl implements UserService {
 
         userEntity.setStatus(UserStatus.DISABLED);
         userRepository.save(userEntity);
+        return true;
     }
 
     @Override
-    public void changePassword(String username, String oldPassword, String newPassword) {
+    public Boolean changePassword(String username, String oldPassword, String newPassword) {
         if (!userRepository.existsById(username))
             throw new UserNotFoundException();
 
@@ -102,6 +104,7 @@ public class UserServiceImpl implements UserService {
 
         userEntity.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(userEntity);
+        return true;
     }
 
     @Override
