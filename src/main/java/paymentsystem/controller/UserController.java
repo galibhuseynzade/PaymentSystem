@@ -38,18 +38,18 @@ public class UserController {
     }
 
     @PutMapping("/activateUser")
-    public void activateUser(@RequestParam String username) {
-        userService.activateUser(username);
+    public Boolean activateUser(@RequestParam String username) {
+        return userService.activateUser(username);
     }
 
     @PutMapping("/disableUser")
-    public void disableUser(@RequestParam String username) {
-        userService.disableUser(username);
+    public Boolean disableUser(@RequestParam String username) {
+        return userService.disableUser(username);
     }
 
     @PutMapping("/changePassword")
-    public void changePassword(@RequestParam String username, @RequestParam String oldPassword, @RequestParam String newPassword) {
-        userService.changePassword(username, oldPassword, newPassword);
+    public Boolean changePassword(@RequestParam String username, @RequestParam String oldPassword, @RequestParam String newPassword) {
+        return userService.changePassword(username, oldPassword, newPassword);
     }
 
 }

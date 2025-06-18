@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import paymentsystem.exception.exceptions.IncorrectPasswordException;
 import paymentsystem.exception.exceptions.PasswordsMatchException;
@@ -32,13 +33,15 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     UserRepository userRepository;
     UserMapper userMapper;
+    PasswordEncoder passwordEncoder;
 
     @Override
     public UserDto createGenericUser(String username, String password) {
         if (userRepository.existsById(username))
             throw new UserAlreadyExistsException();
 
-        UserEntity userEntity = userMapper.buildUserEntity(username, password, UserRole.USER);
+        String encodedPassword = passwordEncoder.encode(password);
+        UserEntity userEntity = userMapper.buildUserEntity(username, encodedPassword, UserRole.USER);
 
         userRepository.save(userEntity);
         log.info("User created " + username);
@@ -50,7 +53,8 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsById(username))
             throw new UserAlreadyExistsException();
 
-        UserEntity userEntity = userMapper.buildUserEntity(username, password, UserRole.ADMIN);
+        String encodedPassword = passwordEncoder.encode(password);
+        UserEntity userEntity = userMapper.buildUserEntity(username, encodedPassword, UserRole.ADMIN);
 
         userRepository.save(userEntity);
         log.info("User created " + username);
@@ -58,7 +62,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void activateUser(String username) {
+    public Boolean activateUser(String username) {
         if (!userRepository.existsById(username))
             throw new UserNotFoundException();
 
@@ -68,10 +72,11 @@ public class UserServiceImpl implements UserService {
 
         userEntity.setStatus(UserStatus.ACTIVE);
         userRepository.save(userEntity);
+        return true;
     }
 
     @Override
-    public void disableUser(String username) {
+    public Boolean disableUser(String username) {
         if (!userRepository.existsById(username))
             throw new UserNotFoundException();
 
@@ -81,23 +86,25 @@ public class UserServiceImpl implements UserService {
 
         userEntity.setStatus(UserStatus.DISABLED);
         userRepository.save(userEntity);
+        return true;
     }
 
     @Override
-    public void changePassword(String username, String oldPassword, String newPassword) {
+    public Boolean changePassword(String username, String oldPassword, String newPassword) {
         if (!userRepository.existsById(username))
             throw new UserNotFoundException();
 
         UserEntity userEntity = userRepository.getReferenceById(username);
-        if (!userEntity.getPassword().equals(oldPassword))
+
+        if (!passwordEncoder.matches(oldPassword, userEntity.getPassword()))
             throw new IncorrectPasswordException();
 
-        if (oldPassword.equals(newPassword))
+        if (passwordEncoder.matches(newPassword, userEntity.getPassword()))
             throw new PasswordsMatchException();
 
-
-        userEntity.setPassword(newPassword);
+        userEntity.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(userEntity);
+        return true;
     }
 
     @Override
