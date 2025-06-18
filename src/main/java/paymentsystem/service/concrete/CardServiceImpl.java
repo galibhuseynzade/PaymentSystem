@@ -54,7 +54,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public void activateCard(String cardNumber) {
+    public Boolean activateCard(String cardNumber) {
         CardEntity cardEntity = cardRepository.findById(cardNumber).orElseThrow(CardNotFoundException::new);
 
         if (!cardEntity.getStatus().equals(CardStatus.NEW))
@@ -63,10 +63,11 @@ public class CardServiceImpl implements CardService {
         cardEntity.setStatus(CardStatus.ACTIVE);
         cardRepository.save(cardEntity);
         log.info("Card activated " + cardNumber);
+        return true;
     }
 
     @Override
-    public void depositCard(String cardNumber, BigDecimal amount) {
+    public Boolean depositCard(String cardNumber, BigDecimal amount) {
         CardEntity cardEntity = cardRepository.findById(cardNumber).orElseThrow(CardNotFoundException::new);
         if (!cardEntity.getStatus().equals(CardStatus.ACTIVE))
             throw new InactiveCardDepositException();
@@ -74,6 +75,7 @@ public class CardServiceImpl implements CardService {
         BigDecimal newBalance = cardEntity.getBalance().add(amount);
         cardEntity.setBalance(newBalance);
         cardRepository.save(cardEntity);
+        return true;
     }
 
     @Override

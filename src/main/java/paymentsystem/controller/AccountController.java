@@ -51,12 +51,12 @@ public class AccountController {
     }
 
     @PutMapping("/activateAccount/{accountNumber}")
-    public void activateAccount(@PathVariable String accountNumber) {
-        accountService.activateAccount(accountNumber);
+    public Boolean activateAccount(@PathVariable String accountNumber) {
+        return accountService.activateAccount(accountNumber);
     }
 
     @PutMapping("/depositAccount/{accountNumber}")
-    public void depositAccount(@PathVariable String accountNumber, @RequestParam BigDecimal amount) {
-        accountService.depositAccount(accountNumber, amount);
+    public Boolean depositAccount(@PathVariable String accountNumber, @RequestParam BigDecimal amount) {
+        return accountService.depositAccount(accountNumber, amount);
     }
 }

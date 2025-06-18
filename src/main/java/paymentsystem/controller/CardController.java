@@ -51,12 +51,12 @@ public class CardController {
     }
 
     @PutMapping("/activateCard/{cardNumber}")
-    public void activateCard(@PathVariable String cardNumber) {
-        cardService.activateCard(cardNumber);
+    public Boolean activateCard(@PathVariable String cardNumber) {
+        return cardService.activateCard(cardNumber);
     }
 
     @PutMapping("/depositCard/{cardNumber}")
-    public void depositCard(@PathVariable String cardNumber, @RequestParam BigDecimal amount) {
-        cardService.depositCard(cardNumber, amount);
+    public Boolean depositCard(@PathVariable String cardNumber, @RequestParam BigDecimal amount) {
+        return cardService.depositCard(cardNumber, amount);
     }
 }

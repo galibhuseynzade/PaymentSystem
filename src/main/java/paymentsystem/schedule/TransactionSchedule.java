@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import paymentsystem.config.DefaultProperties;
 import paymentsystem.config.LimitProperties;
 import paymentsystem.exception.exceptions.AccountNotFoundException;
 import paymentsystem.exception.exceptions.CardNotFoundException;
@@ -35,6 +36,7 @@ public class TransactionSchedule {
     CardRepository cardRepository;
     CustomerRepository customerRepository;
     LimitProperties limitProperties;
+    DefaultProperties defaultProperties;
 
     //    @Scheduled(cron = "0 0 0 * * *")
     @Scheduled(fixedRate = 30000)
@@ -54,7 +56,7 @@ public class TransactionSchedule {
 
     private void checkCustomerStatus(CustomerEntity customerEntity) {
         LocalDate endDate = LocalDate.now();
-        LocalDate startDate = endDate.minusMonths(1);
+        LocalDate startDate = endDate.minusMonths(defaultProperties.getDefaultMonthlyPeriod());
         if (transactionRepository.getMonthlyTotalByCustomer(customerEntity.getCustomerId(), startDate, endDate).compareTo(limitProperties.getDailyTransactionLimit()) > 0) {
             customerEntity.setStatus(CustomerStatus.SUSPECTED);
             customerRepository.save(customerEntity);
@@ -62,7 +64,7 @@ public class TransactionSchedule {
     }
 
     private void updateDebitBalance(String debit, BigDecimal amount) {
-        if (debit.length() == 20) {
+        if (debit.length() == defaultProperties.getDefaultAccountLength()) {
             AccountEntity accountEntity = accountRepository.findById(debit).orElseThrow(AccountNotFoundException::new);
             accountEntity.setBalance(accountEntity.getBalance().subtract(amount));
             accountRepository.save(accountEntity);
@@ -74,7 +76,7 @@ public class TransactionSchedule {
     }
 
     private void updateCreditBalance(String credit, BigDecimal amount) {
-        if (credit.length() == 20) {
+        if (credit.length() == defaultProperties.getDefaultAccountLength()) {
             AccountEntity accountEntity = accountRepository.findById(credit).orElse(null);
             if (accountEntity != null) {
                 accountEntity.setBalance(accountEntity.getBalance().add(amount));
