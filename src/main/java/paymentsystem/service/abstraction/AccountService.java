@@ -10,6 +10,6 @@ public interface AccountService {
     Boolean activateAccount(String accountNumber);
     Boolean depositAccount(String accountNumber, BigDecimal amount);
     Page<AccountDto> getAccountsByCustomerId(Integer customerId, Integer page, Integer size);
-    Page<AccountDto> getAllActiveAccounts(Integer size, Integer page);
-    Page<AccountDto> getAllAccounts(Integer size, Integer page);
+    Page<AccountDto> getAllActiveAccounts(Integer page, Integer size);
+    Page<AccountDto> getAllAccounts(Integer page, Integer size);
 }

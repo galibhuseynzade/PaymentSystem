@@ -42,7 +42,7 @@ springdoc:
   api-docs:
     path: /v3/api-docs
   swagger-ui:
-    path: /swagger-ui.html
+    path: /swagger-ui/index.html
 
 limits:
   maxAccountCount: 3
@@ -58,4 +58,4 @@ defaults:
 
 jwt:
   expirationInMinutes: 30
-  secret: 1f2b3c4d5e6f708192a3b4c5d6e7f8091f2b3c4d5e6f708192a3b4c5d6e7f809
+  secret: BASE64_ENCODED_SECRET_KEY

@@ -10,6 +10,6 @@ public interface CardService {
     Boolean activateCard(String cardNumber);
     Boolean depositCard(String cardNumber, BigDecimal amount);
     Page<CardDto> getCardsByCustomerId(Integer customerId, Integer page, Integer size);
-    Page<CardDto> getAllActiveCards(Integer size, Integer page);
-    Page<CardDto> getAllCards(Integer size, Integer page);
+    Page<CardDto> getAllActiveCards(Integer page, Integer size);
+    Page<CardDto> getAllCards(Integer page, Integer size);
 }

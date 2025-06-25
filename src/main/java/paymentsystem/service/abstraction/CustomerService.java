@@ -5,5 +5,5 @@ import paymentsystem.model.dto.CustomerDto;
 
 public interface CustomerService {
     CustomerDto createCustomer(CustomerDto customerDto);
-    Page<CustomerDto> getAllCustomers(Integer size, Integer page);
+    Page<CustomerDto> getAllCustomers(Integer page, Integer size);
 }

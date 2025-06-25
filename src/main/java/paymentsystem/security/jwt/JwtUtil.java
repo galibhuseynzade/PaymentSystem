@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import paymentsystem.config.JwtProperties;
 
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 
 @Component
@@ -19,7 +20,8 @@ public class JwtUtil {
     JwtProperties jwtProperties;
 
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
+        byte[] decoded = Base64.getDecoder().decode(jwtProperties.getSecret());
+        return Keys.hmacShaKeyFor(decoded);
     }
 
     public String generateToken(String username) {
