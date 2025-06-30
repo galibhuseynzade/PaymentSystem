@@ -30,12 +30,12 @@ spring:
 
 logging:
   level:
-    root: info
-    org.springframework: info
+    root: warn
+    org.springframework: warn
     org.hibernate: warn
-    org.hibernate.SQL: info
-    org.hibernate.type.descriptor.sql: off
-    liquibase: info
+    org.hibernate.SQL: warn
+    org.hibernate.type.descriptor.sql: warn
+    liquibase: warn
     org.postgresql: warn
 
 springdoc:
