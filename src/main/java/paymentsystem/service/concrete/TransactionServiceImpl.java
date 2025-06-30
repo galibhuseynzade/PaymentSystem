@@ -126,18 +126,18 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Page<TransactionDto> getTransactionsByCustomerId(Integer customerId, Integer page, Integer size) {
+    public List<TransactionDto> getTransactionsByCustomerId(Integer customerId, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<TransactionEntity> transactionEntityPage = transactionRepository.findByCustomerEntity_CustomerId(customerId, pageable);
         List<TransactionDto> transactionDtoList = transactionMapper.getTransactionDtoList(transactionEntityPage.getContent());
-        return new PageImpl<>(transactionDtoList, pageable, transactionEntityPage.getTotalElements());
+        return new PageImpl<>(transactionDtoList, pageable, transactionEntityPage.getTotalElements()).getContent();
     }
 
     @Override
-    public Page<TransactionDto> getAllTransactions(Integer page, Integer size) {
+    public List<TransactionDto> getAllTransactions(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<TransactionEntity> transactionEntities = transactionRepository.findAll(pageable);
         List<TransactionDto> transactionDtoList = transactionMapper.getTransactionDtoList(transactionEntities.getContent());
-        return new PageImpl<>(transactionDtoList, pageable, transactionEntities.getTotalElements());
+        return new PageImpl<>(transactionDtoList, pageable, transactionEntities.getTotalElements()).getContent();
     }
 }

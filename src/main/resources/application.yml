@@ -58,4 +58,4 @@ defaults:
 
 jwt:
   expirationInMinutes: 30
-  secret: BASE64_ENCODED_SECRET_KEY
+  secret: 9DwERlZo3FQ7B7G2iDNXz9y0S7ZwVPaMT4+XYwkgJ+I=
