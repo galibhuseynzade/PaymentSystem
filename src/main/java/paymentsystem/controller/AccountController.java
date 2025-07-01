@@ -3,7 +3,6 @@ package paymentsystem.controller;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +14,7 @@ import paymentsystem.model.dto.AccountDto;
 import paymentsystem.service.abstraction.AccountService;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/account")
@@ -24,21 +24,21 @@ public class AccountController {
     AccountService accountService;
 
     @GetMapping
-    public Page<AccountDto> getAllAccounts(@RequestParam(defaultValue = "0", required = false) Integer page,
+    public List<AccountDto> getAllAccounts(@RequestParam(defaultValue = "0", required = false) Integer page,
                                            @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
         return accountService.getAllAccounts(page, size);
     }
 
     @GetMapping("/allActiveAccounts")
-    public Page<AccountDto> getAllActiveAccounts(@RequestParam(defaultValue = "0", required = false) Integer page,
+    public List<AccountDto> getAllActiveAccounts(@RequestParam(defaultValue = "0", required = false) Integer page,
                                                  @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
         return accountService.getAllActiveAccounts(page, size);
     }
 
     @GetMapping("/accountsByCustomerId/{customerId}")
-    public Page<AccountDto> getAccountsByCustomerId(@PathVariable Integer customerId,
+    public List<AccountDto> getAccountsByCustomerId(@PathVariable Integer customerId,
                                                     @RequestParam(defaultValue = "0", required = false) Integer page,
                                                     @RequestParam(defaultValue = "10", required = false) Integer size
     ) {

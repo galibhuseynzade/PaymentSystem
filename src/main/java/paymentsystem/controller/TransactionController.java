@@ -3,7 +3,6 @@ package paymentsystem.controller;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +13,7 @@ import paymentsystem.model.dto.TransactionDto;
 import paymentsystem.service.abstraction.TransactionService;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/transaction")
@@ -23,14 +23,14 @@ public class TransactionController {
     TransactionService transactionService;
 
     @GetMapping
-    public Page<TransactionDto> getAllTransactions(@RequestParam(defaultValue = "0", required = false) Integer page,
+    public List<TransactionDto> getAllTransactions(@RequestParam(defaultValue = "0", required = false) Integer page,
                                                    @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
         return transactionService.getAllTransactions(page, size);
     }
 
     @GetMapping("/transactionsByCustomerId/{customerId}")
-    public Page<TransactionDto> getTransactionsByCustomerId(@PathVariable Integer customerId,
+    public List<TransactionDto> getTransactionsByCustomerId(@PathVariable Integer customerId,
                                                             @RequestParam(defaultValue = "0", required = false) Integer page,
                                                             @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
