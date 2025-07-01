@@ -79,26 +79,26 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public Page<CardDto> getCardsByCustomerId(Integer customerId, Integer page, Integer size) {
+    public List<CardDto> getCardsByCustomerId(Integer customerId, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<CardEntity> cardEntityPage = cardRepository.findByCustomerEntity_CustomerIdAndStatusIn(customerId, validAccountStatusList, pageable);
         List<CardDto> cardDtoList = cardMapper.getCardDtoList(cardEntityPage.getContent());
-        return new PageImpl<>(cardDtoList, pageable, cardEntityPage.getTotalElements());
+        return new PageImpl<>(cardDtoList, pageable, cardEntityPage.getTotalElements()).getContent();
     }
 
     @Override
-    public Page<CardDto> getAllActiveCards(Integer page, Integer size) {
+    public List<CardDto> getAllActiveCards(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<CardEntity> cardEntityPage = cardRepository.findByStatus(CardStatus.ACTIVE, pageable);
         List<CardDto> cardDtoList = cardMapper.getCardDtoList(cardEntityPage.getContent());
-        return new PageImpl<>(cardDtoList, pageable, cardEntityPage.getTotalElements());
+        return new PageImpl<>(cardDtoList, pageable, cardEntityPage.getTotalElements()).getContent();
     }
 
     @Override
-    public Page<CardDto> getAllCards(Integer page, Integer size) {
+    public List<CardDto> getAllCards(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<CardEntity> cardEntityPage = cardRepository.findAll(pageable);
         List<CardDto> cardDtoList = cardMapper.getCardDtoList(cardEntityPage.getContent());
-        return new PageImpl<>(cardDtoList, pageable, cardEntityPage.getTotalElements());
+        return new PageImpl<>(cardDtoList, pageable, cardEntityPage.getTotalElements()).getContent();
     }
 }

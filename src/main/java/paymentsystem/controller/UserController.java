@@ -3,7 +3,6 @@ package paymentsystem.controller;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -13,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import paymentsystem.model.dto.UserDto;
 import paymentsystem.service.abstraction.UserService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
@@ -21,7 +22,7 @@ public class UserController {
     UserService userService;
 
     @GetMapping
-    public Page<UserDto> getAllUsers(@RequestParam(defaultValue = "0", required = false) Integer page,
+    public List<UserDto> getAllUsers(@RequestParam(defaultValue = "0", required = false) Integer page,
                                      @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
         return userService.getAllUsers(page, size);

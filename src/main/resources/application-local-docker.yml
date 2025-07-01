@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: PaymentSystem
+
+  datasource:
+    url: jdbc:postgresql://host.docker.internal:5432/postgres
+    username: postgres
+    password: P@ssw0rd
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  liquibase:
+    change-log: 'classpath:db/db.changelog-master.yml'
+    enabled: true
+    database-change-log-table: database_changelog
+    database-change-log-lock-table: database_changelog_lock
+    default-schema: 'payment'
+
+  jackson:
+    serialization:
+      indent_output: true
+
+logging:
+  level:
+    root: warn
+    org.springframework: warn
+    org.hibernate: warn
+    org.hibernate.SQL: warn
+    org.hibernate.type.descriptor.sql: warn
+    liquibase: warn
+    org.postgresql: warn
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui/index.html
+
+limits:
+  maxAccountCount: 3
+  maxCardCount: 2
+  dailyTransactionLimit: 100
+  minAcceptableAccountBalance: 5
+  minAcceptableCardBalance: 10
+
+defaults:
+  accountLength: 20
+  cardLength: 16
+  monthlyPeriod: 1
+
+jwt:
+  expirationInMinutes: 30
+  secret: 9DwERlZo3FQ7B7G2iDNXz9y0S7ZwVPaMT4+XYwkgJ+I=
+
+server:
+  port: 8181

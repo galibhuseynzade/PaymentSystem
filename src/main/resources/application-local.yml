@@ -30,19 +30,19 @@ spring:
 
 logging:
   level:
-    root: info
-    org.springframework: info
+    root: warn
+    org.springframework: warn
     org.hibernate: warn
-    org.hibernate.SQL: info
-    org.hibernate.type.descriptor.sql: off
-    liquibase: info
+    org.hibernate.SQL: warn
+    org.hibernate.type.descriptor.sql: warn
+    liquibase: warn
     org.postgresql: warn
 
 springdoc:
   api-docs:
     path: /v3/api-docs
   swagger-ui:
-    path: /swagger-ui.html
+    path: /swagger-ui/index.html
 
 limits:
   maxAccountCount: 3
@@ -58,4 +58,4 @@ defaults:
 
 jwt:
   expirationInMinutes: 30
-  secret: 1f2b3c4d5e6f708192a3b4c5d6e7f8091f2b3c4d5e6f708192a3b4c5d6e7f809
+  secret: 9DwERlZo3FQ7B7G2iDNXz9y0S7ZwVPaMT4+XYwkgJ+I=
