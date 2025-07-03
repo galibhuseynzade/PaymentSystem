@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import paymentsystem.exception.exceptions.IncorrectPasswordException;
+import paymentsystem.exception.exceptions.UserHasBeenDisabledException;
 import paymentsystem.exception.exceptions.UserNotFoundException;
 import paymentsystem.model.entity.UserEntity;
+import paymentsystem.model.enums.UserStatus;
 import paymentsystem.repository.UserRepository;
 import paymentsystem.security.dto.AuthenticationResponse;
 import paymentsystem.security.jwt.JwtUtil;
@@ -28,6 +30,7 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(@RequestParam String username, @RequestParam String password) {
         UserEntity userEntity = userRepository.findById(username).orElseThrow(UserNotFoundException::new);
+        if (userEntity.getStatus().equals(UserStatus.DISABLED)) throw new UserHasBeenDisabledException();
         if (!passwordEncoder.matches(password, userEntity.getPassword())) throw new IncorrectPasswordException();
 
         String token = jwtUtil.generateToken(username);
