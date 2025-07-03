@@ -110,9 +110,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> getAllUsers(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<UserEntity> userEntityPage = userRepository.findByStatus(UserStatus.ACTIVE, pageable);
+        Page<UserEntity> userEntityPage = userRepository.findAll(pageable);
         List<UserDto> userDtoList = userEntityPage.getContent().stream().map(userMapper::mapToUserDto).toList();
         return new PageImpl<>(userDtoList, pageable, userEntityPage.getTotalElements()).getContent();
     }
+
 }
 

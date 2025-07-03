@@ -3,6 +3,8 @@ package paymentsystem.controller;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -49,7 +51,8 @@ public class UserController {
     }
 
     @PutMapping("/changePassword")
-    public Boolean changePassword(@RequestParam String username, @RequestParam String oldPassword, @RequestParam String newPassword) {
+    public Boolean changePassword(@AuthenticationPrincipal UserDetails userDetails, @RequestParam String oldPassword, @RequestParam String newPassword) {
+        String username = userDetails.getUsername();
         return userService.changePassword(username, oldPassword, newPassword);
     }
 
