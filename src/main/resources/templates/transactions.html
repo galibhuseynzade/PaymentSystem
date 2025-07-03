@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Transactions</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
     <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 </head>
 <body>
 <div th:fragment="content">
     <div class="container mt-5">
-        <h2>Transaction Management</h2>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>Transaction Management</h2>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#transferModal">
+                Create new transaction
+            </button>
+        </div>
 
         <div class="mb-3">
             <label for="customerId" class="form-label">Customer ID</label>
@@ -20,23 +25,6 @@
             <button class="btn btn-secondary" onclick="fetchAllTransactions()">List All Transactions</button>
             <button class="btn btn-primary" onclick="fetchTransactionsByCustomer()">List Transactions by Customer</button>
         </div>
-
-        <hr>
-
-        <div class="mb-3">
-            <h4>Transfer</h4>
-            <label class="form-label">Debit (Account/Card)</label>
-            <input type="text" class="form-control" id="debit" placeholder="Enter Debit Number">
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Credit (Account/Card)</label>
-            <input type="text" class="form-control" id="credit" placeholder="Enter Credit Number">
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Amount</label>
-            <input type="number" class="form-control" id="amount" placeholder="Enter Amount">
-        </div>
-        <button class="btn btn-success" onclick="transfer()">Transfer</button>
 
         <table class="table mt-4">
             <thead>
@@ -54,20 +42,48 @@
         </table>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="transferModal" tabindex="-1" aria-labelledby="transferModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="transferModalLabel">Create Transaction</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="debit" class="form-label">Debit (Account/Card)</label>
+                        <input type="text" class="form-control" id="debit" placeholder="Enter Debit Number">
+                    </div>
+                    <div class="mb-3">
+                        <label for="credit" class="form-label">Credit (Account/Card)</label>
+                        <input type="text" class="form-control" id="credit" placeholder="Enter Credit Number">
+                    </div>
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Amount</label>
+                        <input type="number" class="form-control" id="amount" placeholder="Enter Amount">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" onclick="transfer()">Transfer</button>
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         function fetchAllTransactions() {
             fetch('/api/v1/transaction')
                 .then(response => response.json())
-                .then(data => populateTable(data))
-                .catch(error => alert('Failed to fetch transactions'));
+                .then(data => populateTable(data));
         }
 
         function fetchTransactionsByCustomer() {
             const customerId = document.getElementById("customerId").value;
             fetch(`/api/v1/transaction/transactionsByCustomerId/${customerId}`)
                 .then(response => response.json())
-                .then(data => populateTable(data))
-                .catch(error => alert('Failed to fetch customer transactions'));
+                .then(data => populateTable(data));
         }
 
         function transfer() {
@@ -76,7 +92,7 @@
             const amount = parseFloat(document.getElementById("amount").value);
 
             if (!debit || !credit || isNaN(amount) || amount <= 0) {
-                alert("Please fill out all fields correctly.");
+                alert("Please enter valid transfer details.");
                 return;
             }
 
@@ -84,15 +100,22 @@
                 method: 'POST'
             })
                 .then(response => {
-                    if (!response.ok) throw new Error("Transfer failed");
+                    if (!response.ok) throw new Error('Transfer failed');
                     return response.json();
                 })
-                .then(() => fetchAllTransactions())
+                .then(() => {
+                    document.getElementById("debit").value = '';
+                    document.getElementById("credit").value = '';
+                    document.getElementById("amount").value = '';
+                    const modal = bootstrap.Modal.getInstance(document.getElementById("transferModal"));
+                    modal.hide();
+                    fetchAllTransactions();
+                })
                 .catch(error => alert(error.message));
         }
 
         function populateTable(transactions) {
-            const tbody = document.getElementById('transactionsTableBody');
+            const tbody = document.getElementById("transactionsTableBody");
             tbody.innerHTML = '';
 
             transactions.forEach(tx => {
