@@ -7,11 +7,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class HomeUiController {
-    @GetMapping("/home")
-    public String homePage(Model model) {
-        model.addAttribute("page", "home");
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class AccountUiController {
+
+    @GetMapping("/accounts")
+    public String getAccountsPage(Model model) {
+        model.addAttribute("page", "accounts");
         return "layout";
     }
 }

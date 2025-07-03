@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class HomeUiController {
-    @GetMapping("/home")
-    public String homePage(Model model) {
-        model.addAttribute("page", "home");
+public class UserUiController {
+    @GetMapping("/users")
+    public String usersPage(Model model) {
+        model.addAttribute("page", "users");
         return "layout";
     }
 }
