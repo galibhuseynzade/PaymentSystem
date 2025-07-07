@@ -24,23 +24,26 @@ public class CardController {
     CardService cardService;
 
     @GetMapping
-    public List<CardDto> getAllCards(@RequestParam(defaultValue = "0", required = false) Integer page,
-                                     @RequestParam(defaultValue = "10", required = false) Integer size
+    public List<CardDto> getAllCards(
+            @RequestParam(defaultValue = "0", required = false) Integer page,
+            @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
         return cardService.getAllCards(page, size);
     }
 
     @GetMapping("/allActiveCards")
-    public List<CardDto> getAllActiveCards(@RequestParam(defaultValue = "0", required = false) Integer page,
-                                           @RequestParam(defaultValue = "10", required = false) Integer size
+    public List<CardDto> getAllActiveCards(
+            @RequestParam(defaultValue = "0", required = false) Integer page,
+            @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
         return cardService.getAllActiveCards(page, size);
     }
 
     @GetMapping("/cardsByCustomerId/{customerId}")
-    public List<CardDto> getCardsByCustomerId(@PathVariable Integer customerId,
-                                              @RequestParam(defaultValue = "0", required = false) Integer page,
-                                              @RequestParam(defaultValue = "10", required = false) Integer size
+    public List<CardDto> getCardsByCustomerId(
+            @PathVariable Integer customerId,
+            @RequestParam(defaultValue = "0", required = false) Integer page,
+            @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
         return cardService.getCardsByCustomerId(customerId, page, size);
     }
@@ -56,7 +59,10 @@ public class CardController {
     }
 
     @PutMapping("/depositCard/{cardNumber}")
-    public Boolean depositCard(@PathVariable String cardNumber, @RequestParam BigDecimal amount) {
+    public Boolean depositCard(
+            @PathVariable String cardNumber,
+            @RequestParam BigDecimal amount
+    ) {
         return cardService.depositCard(cardNumber, amount);
     }
 }
