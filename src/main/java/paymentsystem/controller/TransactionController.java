@@ -23,24 +23,27 @@ public class TransactionController {
     TransactionService transactionService;
 
     @GetMapping
-    public List<TransactionDto> getAllTransactions(@RequestParam(defaultValue = "0", required = false) Integer page,
-                                                   @RequestParam(defaultValue = "10", required = false) Integer size
+    public List<TransactionDto> getAllTransactions(
+            @RequestParam(defaultValue = "0", required = false) Integer page,
+            @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
         return transactionService.getAllTransactions(page, size);
     }
 
     @GetMapping("/transactionsByCustomerId/{customerId}")
-    public List<TransactionDto> getTransactionsByCustomerId(@PathVariable Integer customerId,
-                                                            @RequestParam(defaultValue = "0", required = false) Integer page,
-                                                            @RequestParam(defaultValue = "10", required = false) Integer size
+    public List<TransactionDto> getTransactionsByCustomerId(
+            @PathVariable Integer customerId,
+            @RequestParam(defaultValue = "0", required = false) Integer page,
+            @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
         return transactionService.getTransactionsByCustomerId(customerId, page, size);
     }
 
     @PostMapping("/transfer")
-    public TransactionDto transfer(@RequestParam String debit,
-                                   @RequestParam String credit,
-                                   @RequestParam BigDecimal amount
+    public TransactionDto transfer(
+            @RequestParam String debit,
+            @RequestParam String credit,
+            @RequestParam BigDecimal amount
     ) {
         return transactionService.transfer(debit, credit, amount);
     }

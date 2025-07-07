@@ -38,8 +38,7 @@ public class TransactionSchedule {
     LimitProperties limitProperties;
     DefaultProperties defaultProperties;
 
-    //    @Scheduled(cron = "0 0 0 * * *")
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(cron = "0 0 0 * * *")
     @Transactional
     public void generateTransactions() {
         List<TransactionEntity> transactionEntityList = transactionRepository.findByStatus(TransactionStatus.PENDING);
