@@ -24,19 +24,26 @@ public class UserController {
     UserService userService;
 
     @GetMapping
-    public List<UserDto> getAllUsers(@RequestParam(defaultValue = "0", required = false) Integer page,
-                                     @RequestParam(defaultValue = "10", required = false) Integer size
+    public List<UserDto> getAllUsers(
+            @RequestParam(defaultValue = "0", required = false) Integer page,
+            @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
         return userService.getAllUsers(page, size);
     }
 
     @PostMapping("/createGenericUser")
-    public UserDto createGenericUser(@RequestParam String username, @RequestParam String password) {
+    public UserDto createGenericUser(
+            @RequestParam String username,
+            @RequestParam String password
+    ) {
         return userService.createGenericUser(username, password);
     }
 
     @PostMapping("/createAdminUser")
-    public UserDto createAdminUser(@RequestParam String username, @RequestParam String password) {
+    public UserDto createAdminUser(
+            @RequestParam String username,
+            @RequestParam String password
+    ) {
         return userService.createAdminUser(username, password);
     }
 
@@ -51,7 +58,11 @@ public class UserController {
     }
 
     @PutMapping("/changePassword")
-    public Boolean changePassword(@AuthenticationPrincipal UserDetails userDetails, @RequestParam String oldPassword, @RequestParam String newPassword) {
+    public Boolean changePassword(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam String oldPassword,
+            @RequestParam String newPassword
+    ) {
         String username = userDetails.getUsername();
         return userService.changePassword(username, oldPassword, newPassword);
     }

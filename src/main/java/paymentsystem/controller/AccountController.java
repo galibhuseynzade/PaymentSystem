@@ -24,23 +24,26 @@ public class AccountController {
     AccountService accountService;
 
     @GetMapping
-    public List<AccountDto> getAllAccounts(@RequestParam(defaultValue = "0", required = false) Integer page,
-                                           @RequestParam(defaultValue = "10", required = false) Integer size
+    public List<AccountDto> getAllAccounts(
+            @RequestParam(defaultValue = "0", required = false) Integer page,
+            @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
         return accountService.getAllAccounts(page, size);
     }
 
     @GetMapping("/allActiveAccounts")
-    public List<AccountDto> getAllActiveAccounts(@RequestParam(defaultValue = "0", required = false) Integer page,
-                                                 @RequestParam(defaultValue = "10", required = false) Integer size
+    public List<AccountDto> getAllActiveAccounts(
+            @RequestParam(defaultValue = "0", required = false) Integer page,
+            @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
         return accountService.getAllActiveAccounts(page, size);
     }
 
     @GetMapping("/accountsByCustomerId/{customerId}")
-    public List<AccountDto> getAccountsByCustomerId(@PathVariable Integer customerId,
-                                                    @RequestParam(defaultValue = "0", required = false) Integer page,
-                                                    @RequestParam(defaultValue = "10", required = false) Integer size
+    public List<AccountDto> getAccountsByCustomerId(
+            @PathVariable Integer customerId,
+            @RequestParam(defaultValue = "0", required = false) Integer page,
+            @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
         return accountService.getAccountsByCustomerId(customerId, page, size);
     }
@@ -56,7 +59,10 @@ public class AccountController {
     }
 
     @PutMapping("/depositAccount/{accountNumber}")
-    public Boolean depositAccount(@PathVariable String accountNumber, @RequestParam BigDecimal amount) {
+    public Boolean depositAccount(
+            @PathVariable String accountNumber,
+            @RequestParam BigDecimal amount
+    ) {
         return accountService.depositAccount(accountNumber, amount);
     }
 }
