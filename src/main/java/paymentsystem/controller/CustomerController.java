@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,11 @@ public class CustomerController {
                                              @RequestParam(defaultValue = "10", required = false) Integer size
     ) {
         return customerService.getAllCustomers(page, size);
+    }
+
+    @GetMapping("/getById/{customerId}")
+    public CustomerDto getCustomerById(@PathVariable Integer customerId) {
+        return customerService.getCustomerById(customerId);
     }
 
     @PostMapping

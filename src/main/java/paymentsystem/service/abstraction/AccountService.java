@@ -12,4 +12,5 @@ public interface AccountService {
     List<AccountDto> getAccountsByCustomerId(Integer customerId, Integer page, Integer size);
     List<AccountDto> getAllActiveAccounts(Integer page, Integer size);
     List<AccountDto> getAllAccounts(Integer page, Integer size);
+    AccountDto getAccountByAccountNumber(String accountNumber);
 }

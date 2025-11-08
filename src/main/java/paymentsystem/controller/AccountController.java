@@ -48,6 +48,11 @@ public class AccountController {
         return accountService.getAccountsByCustomerId(customerId, page, size);
     }
 
+    @GetMapping("/getById/{accountNumber}")
+    public AccountDto getAccountById(@PathVariable String accountNumber) {
+        return accountService.getAccountByAccountNumber(accountNumber);
+    }
+
     @PostMapping("/{customerId}")
     public AccountDto createAccount(@PathVariable Integer customerId) {
         return accountService.createAccount(customerId);

@@ -48,6 +48,11 @@ public class CardController {
         return cardService.getCardsByCustomerId(customerId, page, size);
     }
 
+    @GetMapping("/getById/{cardNumber}")
+    public CardDto getCardById(@PathVariable String cardNumber) {
+        return cardService.getCardByCardNumber(cardNumber);
+    }
+
     @PostMapping("/{customerId}")
     public CardDto createCard(@PathVariable Integer customerId) {
         return cardService.createCard(customerId);

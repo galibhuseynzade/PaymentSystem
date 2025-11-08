@@ -12,4 +12,5 @@ public interface CardService {
     List<CardDto> getCardsByCustomerId(Integer customerId, Integer page, Integer size);
     List<CardDto> getAllActiveCards(Integer page, Integer size);
     List<CardDto> getAllCards(Integer page, Integer size);
+    CardDto getCardByCardNumber(String cardNumber);
 }
