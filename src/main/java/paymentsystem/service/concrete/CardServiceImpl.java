@@ -101,4 +101,9 @@ public class CardServiceImpl implements CardService {
         List<CardDto> cardDtoList = cardMapper.getCardDtoList(cardEntityPage.getContent());
         return new PageImpl<>(cardDtoList, pageable, cardEntityPage.getTotalElements()).getContent();
     }
+
+    @Override
+    public CardDto getCardByCardNumber(String cardNumber) {
+        return cardRepository.findById(cardNumber).stream().map(cardMapper::getCardDto).findFirst().orElse(null);
+    }
 }

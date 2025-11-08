@@ -44,4 +44,9 @@ public class CustomerServiceImpl implements CustomerService {
         List<CustomerDto> customerDtoList = customerEntityPage.getContent().stream().map(customerMapper::mapToCustomerDto).toList();
         return new PageImpl<>(customerDtoList, pageable, customerEntityPage.getTotalElements()).getContent();
     }
+
+    @Override
+    public CustomerDto getCustomerById(Integer customerId) {
+        return customerRepository.findById(customerId).map(customerMapper::mapToCustomerDto).orElse(null);
+    }
 }

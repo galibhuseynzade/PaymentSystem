@@ -101,4 +101,9 @@ public class AccountServiceImpl implements AccountService {
         List<AccountDto> accountDtoList = accountMapper.getAccountDtoList(accountEntityPage.getContent());
         return new PageImpl<>(accountDtoList, pageable, accountEntityPage.getTotalElements()).getContent();
     }
+
+    @Override
+    public AccountDto getAccountByAccountNumber(String accountNumber) {
+        return accountRepository.findById(accountNumber).stream().map(accountMapper::getAccountDto).findFirst().orElse(null);
+    }
 }
